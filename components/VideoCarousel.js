@@ -1,0 +1,96 @@
+import { useState } from 'react'
+
+const VIDEOS = [
+  { id: 'dQw4w9WgXcQ', title: 'Rutina de Skincare Diaria', duration: '4:20' },
+  { id: '3JZ_D3ELwOQ', title: 'Oportunidad de Negocio Terramar', duration: '5:15' },
+  { id: 'L_jWHffIx5E', title: 'Maquillaje Natural en 5 Minutos', duration: '3:45' },
+]
+
+export default function VideoCarousel() {
+  const [index, setIndex] = useState(0)
+
+  function prev() {
+    setIndex((i) => (i - 1 + VIDEOS.length) % VIDEOS.length)
+  }
+  function next() {
+    setIndex((i) => (i + 1) % VIDEOS.length)
+  }
+
+  return (
+    <section className="py-20 bg-white">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="text-center mb-10">
+          <span className="text-cyan-600 font-bold tracking-wider uppercase text-sm">Aprende y Crece</span>
+          <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mt-2">Videos Exclusivos</h2>
+          <p className="text-gray-600 mt-2 max-w-2xl mx-auto">
+            Descubre tutoriales, testimonios y consejos.
+          </p>
+        </div>
+
+        <div className="relative max-w-4xl mx-auto">
+          {/* Main Video Container */}
+          <div className="overflow-hidden rounded-2xl shadow-2xl bg-black aspect-video relative group">
+            {VIDEOS.map((v, i) => (
+              <div
+                key={v.id}
+                className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${i === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
+                  }`}
+              >
+                {/* Only render iframe if active or close to active to save resources, 
+                    but simplistic approach: render all hidden is okay for few videos, 
+                     or map and only src the active one for performance */}
+                <iframe
+                  src={i === index ? `https://www.youtube.com/embed/${v.id}?rel=0` : ''}
+                  title={v.title}
+                  className="w-full h-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              </div>
+            ))}
+
+            {/* Navigation Arrows (Absolute over video) */}
+            <button
+              onClick={prev}
+              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/90 hover:text-cyan-700 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110"
+              aria-label="Anterior"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+              </svg>
+            </button>
+            <button
+              onClick={next}
+              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/90 hover:text-cyan-700 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110"
+              aria-label="Siguiente"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+              </svg>
+            </button>
+          </div>
+
+          {/* Thumbnails / Indicators */}
+          <div className="flex justify-center gap-4 mt-8">
+            {VIDEOS.map((v, i) => (
+              <button
+                key={v.id}
+                onClick={() => setIndex(i)}
+                className={`relative overflow-hidden rounded-lg transition-all duration-300 border-2 ${i === index
+                  ? 'w-24 h-16 border-cyan-500 ring-2 ring-cyan-200 ring-offset-2'
+                  : 'w-20 h-14 border-transparent opacity-60 hover:opacity-100'
+                  }`}
+              >
+                <img
+                  src={`https://img.youtube.com/vi/${v.id}/mqdefault.jpg`}
+                  alt={v.title}
+                  className="w-full h-full object-cover"
+                />
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  )
+}
