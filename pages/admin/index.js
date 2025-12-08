@@ -32,8 +32,8 @@ export default function AdminDashboard() {
     const [priceForm, setPriceForm] = useState({
         applyGlobalControl: true,
         globalDiscount: 0,
-        MX: { originalPrice: 0, discount: 0 },
-        US: { originalPrice: 0, discount: 0 }
+        MX: { originalPrice: 0, discount: 0, isVisible: true },
+        US: { originalPrice: 0, discount: 0, isVisible: true }
     })
 
     // Bulk Import State
@@ -170,13 +170,16 @@ export default function AdminDashboard() {
                 setPriceForm({
                     applyGlobalControl: same,
                     globalDiscount: same ? dMX : 0,
+                    image: p.image || '',
                     MX: {
                         originalPrice: mxOrig,
-                        discount: dMX
+                        discount: dMX,
+                        isVisible: p.isVisibleMX !== false
                     },
                     US: {
                         originalPrice: usOrig,
-                        discount: dUS
+                        discount: dUS,
+                        isVisible: p.isVisibleUS !== false
                     }
                 })
 
@@ -189,6 +192,47 @@ export default function AdminDashboard() {
             console.error(error)
         } finally {
             setLoading(false)
+        }
+    }
+
+    const handleVisibilityChange = async (region, isVisible) => {
+        // Update UI state immediately
+        setPriceForm(prev => ({
+            ...prev,
+            [region]: {
+                ...prev[region],
+                isVisible: isVisible
+            }
+        }))
+
+        // Send update to server
+        try {
+            const payload = {
+                key: searchedProduct.key,
+                [`isVisible${region}`]: isVisible
+            }
+
+            const res = await fetch('/api/products/update-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+
+            const data = await res.json()
+
+            if (data.success) {
+                addToast(`Visibilidad ${region} actualizada correctamente`, 'success')
+                // Update the source of truth object too
+                setSearchedProduct(prev => ({
+                    ...prev,
+                    [`isVisible${region}`]: isVisible
+                }))
+            } else {
+                addToast('Error al guardar cambios', 'error')
+            }
+        } catch (e) {
+            console.error(e)
+            addToast('Error de conexión', 'error')
         }
     }
 
@@ -217,7 +261,10 @@ export default function AdminDashboard() {
                 body: JSON.stringify({
                     key: searchedProduct.key,
                     pricesMX: newPricesMX,
-                    pricesUS: newPricesUS
+                    pricesUS: newPricesUS,
+                    isVisibleMX: priceForm.MX.isVisible,
+                    isVisibleUS: priceForm.US.isVisible,
+                    image: priceForm.image
                 })
             })
             const data = await res.json()
@@ -815,12 +862,32 @@ export default function AdminDashboard() {
 
                         {searchedProduct && (
                             <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                                <div className="flex gap-4 mb-6 pb-6 border-b">
-                                    {searchedProduct.image && <img src={searchedProduct.image} alt={searchedProduct.name} className="w-20 h-20 object-cover rounded-lg" />}
-                                    <div>
-                                        <h3 className="font-bold text-lg">{searchedProduct.name}</h3>
-                                        <p className="text-gray-500 text-sm">Clave: {searchedProduct.key}</p>
-                                        <p className="text-gray-500 text-sm">Precio Actual (MX): ${searchedProduct.price}</p>
+                                <div className="flex flex-col md:flex-row gap-6 mb-6 pb-6 border-b">
+                                    <div className="shrink-0 group relative">
+                                        <img
+                                            src={priceForm.image || searchedProduct.image || 'https://via.placeholder.com/150'}
+                                            alt={searchedProduct.name}
+                                            className="w-32 h-32 object-cover rounded-lg shadow-sm bg-gray-100"
+                                            onError={(e) => e.target.src = 'https://via.placeholder.com/150?text=No+Image'}
+                                        />
+                                    </div>
+                                    <div className="flex-1 space-y-3">
+                                        <div>
+                                            <h3 className="font-bold text-xl text-gray-900 leading-tight">{searchedProduct.name}</h3>
+                                            <p className="text-gray-500 font-mono text-sm mt-1">Clave: <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-700 font-bold">{searchedProduct.key}</span></p>
+                                        </div>
+
+                                        <div>
+                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">URL de la Imagen</label>
+                                            <input
+                                                type="text"
+                                                value={priceForm.image}
+                                                onChange={(e) => setPriceForm({ ...priceForm, image: e.target.value })}
+                                                placeholder="https://ejemplo.com/imagen.jpg"
+                                                className="w-full text-sm p-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-shadow bg-blue-50/50"
+                                            />
+                                            <p className="text-[10px] text-gray-400 mt-1">Pega aquí el enlace de Cloudinary o cualquier imagen web.</p>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -875,10 +942,25 @@ export default function AdminDashboard() {
                                     )}
 
                                     {/* MEXICO FORM */}
-                                    <div className="bg-gray-50 p-4 rounded-lg border border-gray-200 relative overflow-hidden">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-2xl">🇲🇽</span>
-                                            <h4 className="font-bold text-gray-800">México (MXN)</h4>
+                                    <div className={`p-4 rounded-lg border relative overflow-hidden transition-colors ${priceForm.MX.isVisible ? 'bg-gray-50 border-gray-200' : 'bg-gray-100 border-gray-200 opacity-75'}`}>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">🇲🇽</span>
+                                                <h4 className="font-bold text-gray-800">México (MXN)</h4>
+                                            </div>
+                                            <label className="flex items-center cursor-pointer select-none">
+                                                <div className="relative">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="sr-only"
+                                                        checked={priceForm.MX.isVisible}
+                                                        onChange={(e) => handleVisibilityChange('MX', e.target.checked)}
+                                                    />
+                                                    <div className={`block w-10 h-6 rounded-full transition-colors ${priceForm.MX.isVisible ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                                                    <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${priceForm.MX.isVisible ? 'transform translate-x-4' : ''}`}></div>
+                                                </div>
+                                                <span className="ml-2 text-xs font-bold text-gray-500 w-12">{priceForm.MX.isVisible ? 'VISIBLE' : 'OCULTO'}</span>
+                                            </label>
                                         </div>
                                         <div className="grid md:grid-cols-2 gap-4">
                                             <div>
@@ -913,10 +995,25 @@ export default function AdminDashboard() {
                                     </div>
 
                                     {/* USA FORM */}
-                                    <div className="bg-blue-50 p-4 rounded-lg border border-blue-200 relative overflow-hidden">
-                                        <div className="flex items-center gap-2 mb-3">
-                                            <span className="text-2xl">🇺🇸</span>
-                                            <h4 className="font-bold text-gray-800">Estados Unidos (USD)</h4>
+                                    <div className={`p-4 rounded-lg border relative overflow-hidden transition-colors ${priceForm.US.isVisible ? 'bg-blue-50 border-blue-200' : 'bg-gray-100 border-gray-200 opacity-75'}`}>
+                                        <div className="flex justify-between items-start mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <span className="text-2xl">🇺🇸</span>
+                                                <h4 className="font-bold text-gray-800">Estados Unidos (USD)</h4>
+                                            </div>
+                                            <label className="flex items-center cursor-pointer select-none">
+                                                <div className="relative">
+                                                    <input
+                                                        type="checkbox"
+                                                        className="sr-only"
+                                                        checked={priceForm.US.isVisible}
+                                                        onChange={(e) => handleVisibilityChange('US', e.target.checked)}
+                                                    />
+                                                    <div className={`block w-10 h-6 rounded-full transition-colors ${priceForm.US.isVisible ? 'bg-green-500' : 'bg-gray-400'}`}></div>
+                                                    <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${priceForm.US.isVisible ? 'transform translate-x-4' : ''}`}></div>
+                                                </div>
+                                                <span className="ml-2 text-xs font-bold text-gray-500 w-12">{priceForm.US.isVisible ? 'VISIBLE' : 'OCULTO'}</span>
+                                            </label>
                                         </div>
                                         <div className="grid md:grid-cols-2 gap-4">
                                             <div>

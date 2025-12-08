@@ -39,6 +39,14 @@ const ProductSchema = new mongoose.Schema({
             price: Number,
             originalPrice: Number,
         }
+    },
+    isVisibleMX: {
+        type: Boolean,
+        default: true
+    },
+    isVisibleUS: {
+        type: Boolean,
+        default: true
     }
 })
 

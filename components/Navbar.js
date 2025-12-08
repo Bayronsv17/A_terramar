@@ -45,8 +45,12 @@ export default function Navbar() {
     setIsLoggedIn(false)
     setUserName('')
     window.dispatchEvent(new Event('auth:logout')) // Notify other components
-    router.push('/login')
+    // Use window.location.href for faster, cleaner logout that forces a reload
+    window.location.href = '/login'
   }
+
+  // Check if current route is public
+  const isPublicRoute = ['/', '/login', '/registro'].includes(router.pathname)
 
   // Navbar for Logged In Users (Client Interface)
   if (isLoggedIn) {
@@ -100,8 +104,9 @@ export default function Navbar() {
     )
   }
 
-  // Minimal Navbar for Login Page
-  if (router.pathname === '/login' || router.pathname === '/registro') {
+  // Minimal Navbar for Login Page OR if we are on a protected route but not logged in (logging out)
+  // This prevents the "Public Landing Page" navbar from flashing during logout
+  if (router.pathname === '/login' || router.pathname === '/registro' || (!isLoggedIn && !isPublicRoute)) {
     return (
       <header className="fixed w-full top-0 z-50 bg-white py-4 shadow-sm">
         <div className="container mx-auto px-6 flex justify-between items-center">

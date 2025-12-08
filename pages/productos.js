@@ -19,6 +19,8 @@ export default function Productos() {
     const [catalogName, setCatalogName] = useState('')
 
     useEffect(() => {
+        let currentRegion = 'MX'
+
         // Get user region from localStorage if logged in
         const userStr = localStorage.getItem('user')
         if (userStr) {
@@ -26,6 +28,7 @@ export default function Productos() {
                 const user = JSON.parse(userStr)
                 if (user.region) {
                     setUserRegion(user.region)
+                    currentRegion = user.region
                 }
             } catch (e) {
                 console.error('Error parsing user data', e)
@@ -60,10 +63,22 @@ export default function Productos() {
 
     // Memoize filtered products
     const filteredProducts = useMemo(() => {
-        return selectedCategory === 'Todas'
-            ? products
-            : products.filter(p => p.category === selectedCategory)
-    }, [selectedCategory, products])
+        let result = products
+
+        // Filter by Visibility
+        result = result.filter(p => {
+            if (userRegion === 'MX') return p.isVisibleMX !== false
+            if (userRegion === 'US') return p.isVisibleUS !== false
+            return true
+        })
+
+        // Filter by Category
+        if (selectedCategory !== 'Todas') {
+            result = result.filter(p => p.category === selectedCategory)
+        }
+
+        return result
+    }, [selectedCategory, products, userRegion])
 
     // Memoize total items calculation
     const totalItems = useMemo(() => {
