@@ -8,6 +8,7 @@ export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [isLoggedIn, setIsLoggedIn] = useState(false)
   const [userRole, setUserRole] = useState('')
+  const [userName, setUserName] = useState('')
   const router = useRouter()
   const { logoutUser } = useCart()
   const { clearToasts } = useToast()
@@ -20,6 +21,15 @@ export default function Navbar() {
     if (localStorage.getItem('token')) {
       setIsLoggedIn(true)
       setUserRole(localStorage.getItem('role') || '')
+      const userStr = localStorage.getItem('user')
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr)
+          setUserName(user.name || user.firstName || 'Usuario')
+        } catch (e) {
+          console.error('Error parsing user data', e)
+        }
+      }
     }
 
     return () => window.removeEventListener('scroll', handleScroll)
@@ -33,6 +43,7 @@ export default function Navbar() {
     localStorage.removeItem('admin_auth')
     logoutUser() // Clear cart context user
     setIsLoggedIn(false)
+    setUserName('')
     window.dispatchEvent(new Event('auth:logout')) // Notify other components
     router.push('/login')
   }
@@ -51,6 +62,12 @@ export default function Navbar() {
           </div>
 
           <div className="flex items-center gap-3 sm:gap-6">
+            {userName && (
+              <span className="text-gray-600 font-medium text-sm hidden sm:block">
+                Hola, <span className="text-cyan-700 font-bold">{userName}</span>
+              </span>
+            )}
+
             {userRole !== 'admin' && (
               <button
                 onClick={() => router.push('/mis-pedidos')}

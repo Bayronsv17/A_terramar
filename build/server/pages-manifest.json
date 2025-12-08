@@ -2,10 +2,7 @@
   "/_app": "pages/_app.js",
   "/_error": "pages/_error.js",
   "/_document": "pages/_document.js",
-  "/": "pages/index.js",
-  "/login": "pages/login.js",
-  "/api/orders": "pages/api/orders.js",
-  "/admin": "pages/admin.js",
-  "/api/settings": "pages/api/settings.js",
-  "/api/auth/login": "pages/api/auth/login.js"
+  "/productos": "pages/productos.js",
+  "/carrito": "pages/carrito.js",
+  "/login": "pages/login.js"
 }
