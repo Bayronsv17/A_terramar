@@ -48,8 +48,8 @@ export default function AdminDashboard() {
     const [catalogName, setCatalogName] = useState('')
 
     const discountOptions = []
-    for (let i = 0; i <= 80; i += 5) {
-        discountOptions.push(i)
+    for (let discountIdx = 0; discountIdx <= 80; discountIdx += 5) {
+        discountOptions.push(discountIdx)
     }
 
     const fetchOrders = useCallback(async () => {
