@@ -129,6 +129,20 @@ export default function Productos() {
         }
 
         if (product) {
+            // Validate Visibility based on Region
+            let isVisible = true
+            if (userRegion === 'US') {
+                if (typeof product.isVisibleUS !== 'undefined') isVisible = product.isVisibleUS
+            } else {
+                if (typeof product.isVisibleMX !== 'undefined') isVisible = product.isVisibleMX
+            }
+
+            if (!isVisible) {
+                addToast('Producto no encontrado', 'error')
+                setSearchKey('')
+                return
+            }
+
             // RESOLVE PRICE AND VISIBILITY BASED ON REGION
             let finalPrice = product.price
             let finalOriginalPrice = product.originalPrice

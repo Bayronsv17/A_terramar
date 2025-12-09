@@ -314,6 +314,33 @@ export default function AdminDashboard() {
         }
     }
 
+    const handleUpdateImageOnly = async () => {
+        if (!searchedProduct) return
+        setLoading(true)
+        try {
+            const res = await fetch('/api/products/update-price', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    key: searchedProduct.key,
+                    image: priceForm.image
+                })
+            })
+            const data = await res.json()
+            if (data.success) {
+                addToast('Imagen actualizada correctamente', 'success')
+                setSearchedProduct(prev => ({ ...prev, image: priceForm.image }))
+            } else {
+                addToast(data.message || 'Error al actualizar', 'error')
+            }
+        } catch (e) {
+            console.error(e)
+            addToast('Error de conexión', 'error')
+        } finally {
+            setLoading(false)
+        }
+    }
+
     const handleDeleteProduct = async () => {
         if (!searchedProduct || !confirm('¿Estás seguro de que deseas eliminar este producto? Esta acción no se puede deshacer.')) return
 
@@ -861,209 +888,194 @@ export default function AdminDashboard() {
                         </div>
 
                         {searchedProduct && (
-                            <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
-                                <div className="flex flex-col md:flex-row gap-6 mb-6 pb-6 border-b">
-                                    <div className="shrink-0 group relative">
-                                        <img
-                                            src={priceForm.image || searchedProduct.image || 'https://via.placeholder.com/150'}
-                                            alt={searchedProduct.name}
-                                            className="w-32 h-32 object-cover rounded-lg shadow-sm bg-gray-100"
-                                            onError={(e) => e.target.src = 'https://via.placeholder.com/150?text=No+Image'}
-                                        />
-                                    </div>
-                                    <div className="flex-1 space-y-3">
-                                        <div>
-                                            <h3 className="font-bold text-xl text-gray-900 leading-tight">{searchedProduct.name}</h3>
-                                            <p className="text-gray-500 font-mono text-sm mt-1">Clave: <span className="bg-gray-100 px-2 py-0.5 rounded text-gray-700 font-bold">{searchedProduct.key}</span></p>
+                            <div className="space-y-8 animate-fade-in">
+                                {/* SECTION 1: IDENTITY & IMAGE */}
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-100 flex justify-between items-center">
+                                        <h3 className="font-bold text-gray-800 text-lg flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-500"><path d="M12 9a3.75 3.75 0 100 7.5A3.75 3.75 0 0012 9z" /><path fillRule="evenodd" d="M9.344 3.071a49.52 49.52 0 015.312 0c.967.052 1.83.585 2.332 1.39l.821 1.317c.24.383.645.643 1.11.71.386.054.77.113 1.152.177 1.432.239 2.429 1.493 2.429 2.909V18a3 3 0 01-3 3h-15a3 3 0 01-3-3V9.574c0-1.416.997-2.67 2.429-2.909.382-.064.766-.123 1.151-.178a1.56 1.56 0 001.11-.71l.822-1.315a2.942 2.942 0 012.332-1.39zM6.75 12.75a5.25 5.25 0 1110.5 0 5.25 5.25 0 01-10.5 0zm12-1.5a.75.75 0 100-1.5.75.75 0 000 1.5z" clipRule="evenodd" /></svg>
+                                            Imagen e Identidad</h3>
+                                        <div className="flex items-center gap-2">
+                                            <span className="text-xs text-gray-500 uppercase font-bold">Clave:</span>
+                                            <span className="bg-blue-100 text-blue-800 text-sm font-bold px-3 py-1 rounded-full">{searchedProduct.key}</span>
                                         </div>
+                                    </div>
 
-                                        <div>
-                                            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">URL de la Imagen</label>
-                                            <input
-                                                type="text"
-                                                value={priceForm.image}
-                                                onChange={(e) => setPriceForm({ ...priceForm, image: e.target.value })}
-                                                placeholder="https://ejemplo.com/imagen.jpg"
-                                                className="w-full text-sm p-2 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-shadow bg-blue-50/50"
-                                            />
-                                            <p className="text-[10px] text-gray-400 mt-1">Pega aquí el enlace de Cloudinary o cualquier imagen web.</p>
+                                    <div className="p-6">
+                                        <div className="flex flex-col md:flex-row gap-8 items-start">
+                                            {/* Left: Image Preview */}
+                                            <div className="w-full md:w-64 flex-shrink-0">
+                                                <div className="aspect-square bg-gray-100 rounded-lg shadow-inner overflow-hidden border border-gray-200 relative group">
+                                                    <img
+                                                        src={priceForm.image || searchedProduct.image || 'https://via.placeholder.com/150'}
+                                                        alt={searchedProduct.name}
+                                                        className="w-full h-full object-contain p-2"
+                                                        onError={(e) => e.target.src = 'https://via.placeholder.com/150?text=No+Image'}
+                                                    />
+                                                </div>
+                                            </div>
+
+                                            {/* Right: Info & Update Input */}
+                                            <div className="flex-1 w-full space-y-6">
+                                                <div>
+                                                    <label className="text-xs font-bold text-gray-400 uppercase tracking-wider">Nombre del Producto</label>
+                                                    <h2 className="text-2xl font-bold text-gray-900 leading-tight">{searchedProduct.name}</h2>
+                                                </div>
+
+                                                <div className="bg-blue-50 p-5 rounded-xl border border-blue-100 shadow-sm">
+                                                    <label className="block text-sm font-bold text-blue-900 mb-2">Editor Rápido de Imagen</label>
+                                                    <div className="flex flex-col sm:flex-row gap-3">
+                                                        <input
+                                                            type="text"
+                                                            value={priceForm.image}
+                                                            onChange={(e) => setPriceForm({ ...priceForm, image: e.target.value })}
+                                                            placeholder="https://..."
+                                                            className="flex-1 p-3 border border-blue-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm bg-white"
+                                                        />
+                                                        <button
+                                                            type="button"
+                                                            onClick={handleUpdateImageOnly}
+                                                            disabled={loading}
+                                                            className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-6 py-3 rounded-lg shadow-sm transition-all whitespace-nowrap flex items-center justify-center gap-2"
+                                                        >
+                                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5"><path d="M11.47 1.72a.75.75 0 011.06 0l3 3a.75.75 0 01-1.06 1.06l-1.72-1.72V7.5h-1.5V4.06L9.53 5.78a.75.75 0 01-1.06-1.06l3-3zM11.25 7.5V15a.75.75 0 001.5 0V7.5h3.75a3 3 0 013 3v9a3 3 0 01-3 3h-9a3 3 0 01-3-3v-9a3 3 0 013-3h3.75z" /></svg>
+                                                            Guardar Imagen
+                                                        </button>
+                                                    </div>
+                                                    <p className="text-xs text-blue-600 mt-2 flex items-center gap-1">
+                                                        ℹ️ Usa este botón para actualizar <strong>solo</strong> la foto sin tocar precios.
+                                                    </p>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
 
-                                <h3 className="font-bold mb-4">Actualizar Precios por Región</h3>
-                                <form onSubmit={handleUpdatePrice} className="space-y-6">
-
-                                    {/* CONTROL MODE TOGGLE */}
-                                    <div className="bg-indigo-50 p-4 rounded-lg border border-indigo-100 flex flex-col md:flex-row justify-between items-center gap-4">
-                                        <div>
-                                            <h4 className="font-bold text-indigo-900">Modo de Control de Descuentos</h4>
-                                            <p className="text-xs text-indigo-600">Elige si quieres aplicar el mismo descuento a todos o personalizarlo.</p>
-                                        </div>
-                                        <div className="flex bg-white rounded-lg p-1 border border-indigo-200 shadow-sm">
-                                            <button
-                                                type="button"
-                                                onClick={() => setPriceForm(prev => ({ ...prev, applyGlobalControl: true, globalDiscount: prev.MX.discount || 0 }))}
-                                                className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${priceForm.applyGlobalControl ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
-                                            >
-                                                Unificado (Iguales)
-                                            </button>
-                                            <button
-                                                type="button"
-                                                onClick={() => setPriceForm(prev => ({ ...prev, applyGlobalControl: false }))}
-                                                className={`px-4 py-2 rounded-md text-sm font-bold transition-all ${!priceForm.applyGlobalControl ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}
-                                            >
-                                                Individual (Por País)
-                                            </button>
+                                {/* SECTION 2: PRICING & CONFIG */}
+                                <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                    <div className="bg-gray-50 px-6 py-4 border-b border-gray-100">
+                                        <div className="flex items-center gap-2">
+                                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-gray-500">
+                                                <path d="M10.464 8.746c.227-.18.497-.311.786-.394v2.795a2.252 2.252 0 01-.786-.393c-.394-.313-.546-.681-.546-1.004 0-.314.156-.68.546-1.004zM12.75 15.662v-2.824c.347.085.664.228.921.421.427.32.579.686.579.991 0 .305-.152.671-.579.991a2.534 2.534 0 01-.921.42z" />
+                                                <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v.816a3.836 3.836 0 00-1.72.656c-.89.658-1.53 1.58-1.53 2.624s.64 1.967 1.53 2.624c.296.219.635.418 1.006.581v1.518a3.84 3.84 0 00-1.72.656c-.89.658-1.53 1.58-1.53 2.624s.64 1.967 1.53 2.624c.533.394 1.148.696 1.838.869V18a.75.75 0 001.5 0v-.816a3.836 3.836 0 001.72-.656c.89-.658 1.53-1.58 1.53-2.624s-.64-1.967-1.53-2.624a3.84 3.84 0 00-1.006-.581v-1.518a3.84 3.84 0 001.72-.656c.89-.658 1.53-1.58 1.53-2.624s-.64-1.967-1.53-2.624c-.533-.394-1.148-.696-1.838-.869V6zM4.5 9.75a8.25 8.25 0 1114.22 6.64 8.25 8.25 0 01-14.22-6.64z" clipRule="evenodd" />
+                                            </svg>
+                                            <h3 className="font-bold text-gray-800 text-lg">Precios y Configuración</h3>
                                         </div>
                                     </div>
 
-                                    {priceForm.applyGlobalControl && (
-                                        <div className="bg-purple-50 p-4 rounded-lg border border-purple-200">
-                                            <label className="block text-sm font-bold text-purple-900 mb-2">Descuento Unificado (%)</label>
-                                            <select
-                                                value={priceForm.globalDiscount}
-                                                onChange={(e) => {
-                                                    const val = Number(e.target.value)
-                                                    setPriceForm(prev => ({
-                                                        ...prev,
-                                                        globalDiscount: val,
-                                                        MX: { ...prev.MX, discount: val },
-                                                        US: { ...prev.US, discount: val }
-                                                    }))
-                                                }}
-                                                className="w-full p-2 border border-purple-300 rounded-lg focus:ring-2 focus:ring-purple-500 outline-none bg-white font-bold text-lg"
-                                            >
-                                                {discountOptions.map(opt => (
-                                                    <option key={opt} value={opt}>{opt}%</option>
-                                                ))}
-                                            </select>
-                                        </div>
-                                    )}
+                                    <div className="p-6">
+                                        <form onSubmit={handleUpdatePrice} className="space-y-6">
 
-                                    {/* MEXICO FORM */}
-                                    <div className={`p-4 rounded-lg border relative overflow-hidden transition-colors ${priceForm.MX.isVisible ? 'bg-gray-50 border-gray-200' : 'bg-gray-100 border-gray-200 opacity-75'}`}>
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-2xl">🇲🇽</span>
-                                                <h4 className="font-bold text-gray-800">México (MXN)</h4>
-                                            </div>
-                                            <label className="flex items-center cursor-pointer select-none">
-                                                <div className="relative">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="sr-only"
-                                                        checked={priceForm.MX.isVisible}
-                                                        onChange={(e) => handleVisibilityChange('MX', e.target.checked)}
-                                                    />
-                                                    <div className={`block w-10 h-6 rounded-full transition-colors ${priceForm.MX.isVisible ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                                                    <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${priceForm.MX.isVisible ? 'transform translate-x-4' : ''}`}></div>
-                                                </div>
-                                                <span className="ml-2 text-xs font-bold text-gray-500 w-12">{priceForm.MX.isVisible ? 'VISIBLE' : 'OCULTO'}</span>
-                                            </label>
-                                        </div>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Precio Original (Base)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    className="w-full p-2 border rounded-lg mb-2 text-lg font-medium"
-                                                    value={priceForm.MX.originalPrice}
-                                                    onChange={(e) => setPriceForm({ ...priceForm, MX: { ...priceForm.MX, originalPrice: e.target.value } })}
-                                                />
-                                            </div>
-                                            {!priceForm.applyGlobalControl && (
+                                            {/* Toggle Control Mode */}
+                                            <div className="flex flex-col sm:flex-row justify-between items-center bg-indigo-50 p-4 rounded-lg border border-indigo-100 gap-4">
                                                 <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Descuento MX (%)</label>
-                                                    <select
-                                                        value={priceForm.MX.discount}
-                                                        onChange={(e) => setPriceForm({ ...priceForm, MX: { ...priceForm.MX, discount: Number(e.target.value) } })}
-                                                        className="w-full p-2 border rounded-lg bg-white font-bold"
-                                                    >
-                                                        {discountOptions.map(opt => (
-                                                            <option key={opt} value={opt}>{opt}%</option>
-                                                        ))}
+                                                    <div className="font-bold text-indigo-900">Modo de Descuentos</div>
+                                                    <div className="text-xs text-indigo-600">¿Aplicar el mismo % a ambos países?</div>
+                                                </div>
+                                                <div className="flex bg-white rounded-lg p-1 border border-indigo-200 shadow-sm">
+                                                    <button type="button" onClick={() => setPriceForm(prev => ({ ...prev, applyGlobalControl: true, globalDiscount: prev.MX.discount || 0 }))} className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${priceForm.applyGlobalControl ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}>IGUALES</button>
+                                                    <button type="button" onClick={() => setPriceForm(prev => ({ ...prev, applyGlobalControl: false }))} className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${!priceForm.applyGlobalControl ? 'bg-indigo-600 text-white shadow' : 'text-gray-500 hover:bg-gray-50'}`}>POR PAÍS</button>
+                                                </div>
+                                            </div>
+
+                                            {priceForm.applyGlobalControl && (
+                                                <div className="bg-purple-50 p-4 rounded-lg border border-purple-200 flex items-center gap-4">
+                                                    <label className="font-bold text-purple-900 text-sm whitespace-nowrap">Descuento Global:</label>
+                                                    <select value={priceForm.globalDiscount} onChange={(e) => { const v = Number(e.target.value); setPriceForm(p => ({ ...p, globalDiscount: v, MX: { ...p.MX, discount: v }, US: { ...p.US, discount: v } })) }} className="w-full p-2 border-purple-300 rounded-lg font-bold text-purple-700 outline-none bg-white">
+                                                        {discountOptions.map(o => <option key={o} value={o}>{o}%</option>)}
                                                     </select>
                                                 </div>
                                             )}
-                                        </div>
-                                        <div className="mt-3 flex justify-between items-center bg-white p-3 rounded-lg border border-gray-100 shadow-sm">
-                                            <span className="text-gray-600 font-medium">Nuevo Precio al Cliente:</span>
-                                            <span className="text-2xl font-bold text-green-600">${calculatePreviewPrice('MX', priceForm.MX.originalPrice)}</span>
-                                        </div>
-                                    </div>
 
-                                    {/* USA FORM */}
-                                    <div className={`p-4 rounded-lg border relative overflow-hidden transition-colors ${priceForm.US.isVisible ? 'bg-blue-50 border-blue-200' : 'bg-gray-100 border-gray-200 opacity-75'}`}>
-                                        <div className="flex justify-between items-start mb-3">
-                                            <div className="flex items-center gap-2">
-                                                <span className="text-2xl">🇺🇸</span>
-                                                <h4 className="font-bold text-gray-800">Estados Unidos (USD)</h4>
-                                            </div>
-                                            <label className="flex items-center cursor-pointer select-none">
-                                                <div className="relative">
-                                                    <input
-                                                        type="checkbox"
-                                                        className="sr-only"
-                                                        checked={priceForm.US.isVisible}
-                                                        onChange={(e) => handleVisibilityChange('US', e.target.checked)}
-                                                    />
-                                                    <div className={`block w-10 h-6 rounded-full transition-colors ${priceForm.US.isVisible ? 'bg-green-500' : 'bg-gray-400'}`}></div>
-                                                    <div className={`absolute left-1 top-1 bg-white w-4 h-4 rounded-full transition-transform ${priceForm.US.isVisible ? 'transform translate-x-4' : ''}`}></div>
+                                            {/* Columns */}
+                                            <div className="grid md:grid-cols-2 gap-6">
+                                                {/* MX */}
+                                                <div className={`border rounded-xl p-5 transition-all ${priceForm.MX.isVisible ? 'bg-white border-gray-200 shadow-sm' : 'bg-gray-50 border-gray-200 opacity-60'}`}>
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="bg-gray-100 text-gray-600 px-2 py-1 rounded text-xs font-bold border border-gray-200">MX</span>
+                                                            <span className="font-bold text-gray-800">México (MXN)</span>
+                                                        </div>
+                                                        <label className="flex items-center gap-2 cursor-pointer">
+                                                            <input type="checkbox" checked={priceForm.MX.isVisible} onChange={e => handleVisibilityChange('MX', e.target.checked)} className="w-4 h-4 text-green-600 rounded bg-gray-100 border-gray-300 focus:ring-green-500 focus:ring-2" />
+                                                            <span className="text-xs font-bold uppercase select-none">{priceForm.MX.isVisible ? 'Visible' : 'Oculto'}</span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <label className="text-xs font-medium text-gray-500 block mb-1">Precio Base</label>
+                                                            <div className="relative">
+                                                                <span className="absolute left-3 top-2 text-gray-400">$</span>
+                                                                <input type="number" step="0.01" value={priceForm.MX.originalPrice} onChange={e => setPriceForm({ ...priceForm, MX: { ...priceForm.MX, originalPrice: e.target.value } })} className="w-full pl-6 p-2 border rounded font-bold text-gray-800 focus:ring-2 focus:ring-green-500 outline-none" />
+                                                            </div>
+                                                        </div>
+                                                        {!priceForm.applyGlobalControl && (
+                                                            <div>
+                                                                <label className="text-xs font-medium text-gray-500 block mb-1">Descuento (%)</label>
+                                                                <select value={priceForm.MX.discount} onChange={e => setPriceForm({ ...priceForm, MX: { ...priceForm.MX, discount: Number(e.target.value) } })} className="w-full p-2 border rounded bg-white">
+                                                                    {discountOptions.map(o => <option key={o} value={o}>{o}%</option>)}
+                                                                </select>
+                                                            </div>
+                                                        )}
+                                                        <div className="pt-3 mt-2 border-t flex justify-between items-center">
+                                                            <span className="text-xs text-gray-400">Precio Final:</span>
+                                                            <span className="font-bold text-green-600 text-xl">${calculatePreviewPrice('MX', priceForm.MX.originalPrice)}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                                <span className="ml-2 text-xs font-bold text-gray-500 w-12">{priceForm.US.isVisible ? 'VISIBLE' : 'OCULTO'}</span>
-                                            </label>
-                                        </div>
-                                        <div className="grid md:grid-cols-2 gap-4">
-                                            <div>
-                                                <label className="block text-sm font-medium text-gray-700 mb-1">Precio Original (Base)</label>
-                                                <input
-                                                    type="number"
-                                                    step="0.01"
-                                                    className="w-full p-2 border rounded-lg mb-2 text-lg font-medium"
-                                                    value={priceForm.US.originalPrice}
-                                                    onChange={(e) => setPriceForm({ ...priceForm, US: { ...priceForm.US, originalPrice: e.target.value } })}
-                                                />
-                                            </div>
-                                            {!priceForm.applyGlobalControl && (
-                                                <div>
-                                                    <label className="block text-sm font-medium text-gray-700 mb-1">Descuento US (%)</label>
-                                                    <select
-                                                        value={priceForm.US.discount}
-                                                        onChange={(e) => setPriceForm({ ...priceForm, US: { ...priceForm.US, discount: Number(e.target.value) } })}
-                                                        className="w-full p-2 border rounded-lg bg-white font-bold"
-                                                    >
-                                                        {discountOptions.map(opt => (
-                                                            <option key={opt} value={opt}>{opt}%</option>
-                                                        ))}
-                                                    </select>
+
+                                                {/* US */}
+                                                <div className={`border rounded-xl p-5 transition-all ${priceForm.US.isVisible ? 'bg-white border-blue-200 shadow-sm' : 'bg-gray-50 border-gray-200 opacity-60'}`}>
+                                                    <div className="flex justify-between items-center mb-4">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded text-xs font-bold border border-blue-100">US</span>
+                                                            <span className="font-bold text-gray-800">USA (USD)</span>
+                                                        </div>
+                                                        <label className="flex items-center gap-2 cursor-pointer">
+                                                            <input type="checkbox" checked={priceForm.US.isVisible} onChange={e => handleVisibilityChange('US', e.target.checked)} className="w-4 h-4 text-blue-600 rounded bg-gray-100 border-gray-300 focus:ring-blue-500 focus:ring-2" />
+                                                            <span className="text-xs font-bold uppercase select-none">{priceForm.US.isVisible ? 'Visible' : 'Oculto'}</span>
+                                                        </label>
+                                                    </div>
+                                                    <div className="space-y-3">
+                                                        <div>
+                                                            <label className="text-xs font-medium text-gray-500 block mb-1">Precio Base</label>
+                                                            <div className="relative">
+                                                                <span className="absolute left-3 top-2 text-gray-400">$</span>
+                                                                <input type="number" step="0.01" value={priceForm.US.originalPrice} onChange={e => setPriceForm({ ...priceForm, US: { ...priceForm.US, originalPrice: e.target.value } })} className="w-full pl-6 p-2 border rounded font-bold text-gray-800 focus:ring-2 focus:ring-blue-500 outline-none" />
+                                                            </div>
+                                                        </div>
+                                                        {!priceForm.applyGlobalControl && (
+                                                            <div>
+                                                                <label className="text-xs font-medium text-gray-500 block mb-1">Descuento (%)</label>
+                                                                <select value={priceForm.US.discount} onChange={e => setPriceForm({ ...priceForm, US: { ...priceForm.US, discount: Number(e.target.value) } })} className="w-full p-2 border rounded bg-white">
+                                                                    {discountOptions.map(o => <option key={o} value={o}>{o}%</option>)}
+                                                                </select>
+                                                            </div>
+                                                        )}
+                                                        <div className="pt-3 mt-2 border-t flex justify-between items-center">
+                                                            <span className="text-xs text-gray-400">Precio Final:</span>
+                                                            <span className="font-bold text-green-600 text-xl">${calculatePreviewPrice('US', priceForm.US.originalPrice)}</span>
+                                                        </div>
+                                                    </div>
                                                 </div>
-                                            )}
-                                        </div>
-                                        <div className="mt-3 flex justify-between items-center bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
-                                            <span className="text-gray-600 font-medium">Nuevo Precio al Cliente:</span>
-                                            <span className="text-2xl font-bold text-green-600">${calculatePreviewPrice('US', priceForm.US.originalPrice)}</span>
-                                        </div>
+                                            </div>
+
+                                            <button type="submit" disabled={loading} className="w-full bg-green-600 text-white py-4 rounded-xl font-bold hover:bg-green-700 transition-all shadow-lg text-lg transform hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6"><path fillRule="evenodd" d="M2.25 12c0-5.385 4.365-9.75 9.75-9.75s9.75 4.365 9.75 9.75-4.365 9.75-9.75 9.75S2.25 17.385 2.25 12zm13.36-1.814a.75.75 0 10-1.22-.872l-3.236 4.53L9.53 12.22a.75.75 0 00-1.06 1.06l2.25 2.25a.75.75 0 001.14-.094l3.75-5.25z" clipRule="evenodd" /></svg>
+                                                Guardar Configuración de Precios
+                                            </button>
+                                        </form>
                                     </div>
+                                </div>
 
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition-all shadow-md text-lg"
-                                        disabled={loading}
-                                    >
-                                        {loading ? 'Guardando...' : 'Guardar Todos los Cambios'}
-                                    </button>
-                                </form>
-
-                                <div className="mt-12 pt-8 border-t border-gray-100">
-                                    <h4 className="font-bold text-red-600 mb-2">Zona de Peligro</h4>
-                                    <p className="text-sm text-gray-500 mb-4">Una vez eliminado, este producto no se podrá recuperar.</p>
+                                {/* Danger Zone */}
+                                <div className="mt-8 pt-6 border-t border-gray-200 flex justify-end">
                                     <button
                                         type="button"
                                         onClick={handleDeleteProduct}
-                                        className="w-full bg-white border border-red-200 text-red-600 py-2 rounded-lg font-bold hover:bg-red-50 transition-colors"
+                                        className="text-red-500 text-xs hover:text-red-700 font-bold hover:underline transition-colors flex items-center gap-1 opacity-70 hover:opacity-100"
                                     >
+                                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><path fillRule="evenodd" d="M16.5 4.478v.227a48.816 48.816 0 013.878.512.75.75 0 11-.256 1.478l-.209-.035-1.005 13.07a3 3 0 01-2.991 2.77H8.084a3 3 0 01-2.991-2.77L4.087 6.66l-.209.035a.75.75 0 01-.256-1.478A48.567 48.567 0 017.5 4.705v-.227c0-1.564 1.213-2.9 2.816-2.951a52.662 52.662 0 013.369 0c1.603.051 2.815 1.387 2.815 2.951zm-6.136-1.452a51.196 51.196 0 013.273 0C14.39 3.05 15 3.684 15 4.478v.113a49.488 49.488 0 00-6 0v-.113c0-.794.609-1.428 1.636-1.452zM12.927 5.82a.75.75 0 00-1.498.05l.344 1.056c.005.016.01.033.016.05L12.926 5.82z" clipRule="evenodd" /></svg>
                                         Eliminar Producto
                                     </button>
                                 </div>
