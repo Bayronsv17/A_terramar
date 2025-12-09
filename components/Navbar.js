@@ -52,8 +52,8 @@ export default function Navbar() {
   // Check if current route is public
   const isPublicRoute = ['/', '/login', '/registro'].includes(router.pathname)
 
-  // Navbar for Logged In Users (Client Interface)
-  if (isLoggedIn) {
+  // Navbar for Logged In Users (Client Interface) - Except on Home
+  if (isLoggedIn && router.pathname !== '/') {
     return (
       <header
         className={`fixed w-full top-0 z-50 transition-all duration-300 ${scrolled ? 'bg-white/90 backdrop-blur-md shadow-md py-3' : 'bg-white py-4 shadow-sm'}`}

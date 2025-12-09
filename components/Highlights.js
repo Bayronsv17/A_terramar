@@ -1,27 +1,26 @@
 import Image from 'next/image'
 
-const products = [
-  {
-    title: 'Óleo Tratamiento',
-    img: '/assets/high1.jpg',
-    desc: 'Repara, nutre y da brillo espectacular sin sensación grasa. El #1 de Terramar.',
-    price: '$550.00'
-  },
-  {
-    title: 'Polvo Micro-Exfoliante',
-    img: '/assets/high2.jpg',
-    desc: 'Exfoliación suave con extracto de perla y arroz para una piel radiante.',
-    price: '$610.00'
-  },
-  {
-    title: 'Mascarilla Intensiva',
-    img: '/assets/high3.jpg',
-    desc: 'Hidratación profunda y efecto lifting inmediato para lucir siempre joven.',
-    price: '$480.00'
-  },
-]
+export default function Highlights({ products }) {
+  const defaultProducts = [
+    {
+      title: 'Óleo Tratamiento',
+      img: 'https://res.cloudinary.com/dih0cyoun/image/upload/v1765290317/Oleo_Tratamiento_pf6dlv.webp',
+      desc: 'Repara, nutre y da brillo espectacular sin sensación grasa. El #1 de Terramar.',
+    },
+    {
+      title: 'Polvo Micro-Exfoliante',
+      img: 'https://res.cloudinary.com/dih0cyoun/image/upload/v1765290433/Polvo_microexfoliante_kadvvk.webp',
+      desc: 'Exfoliación suave con extracto de perla y arroz para una piel radiante.',
+    },
+    {
+      title: 'Mascarilla Intensiva',
+      img: 'https://res.cloudinary.com/dih0cyoun/image/upload/v1765290432/mascarilla_intensiva_culnbf.webp',
+      desc: 'Hidratación profunda y efecto lifting inmediato para lucir siempre joven.',
+    },
+  ]
 
-export default function Highlights() {
+  const items = (products && products.length > 0) ? products : defaultProducts
+
   return (
     <section id="products" className="py-20 bg-gray-50">
       <div className="container mx-auto px-6">
@@ -34,30 +33,26 @@ export default function Highlights() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {products.map((p, i) => (
-            <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 group">
-              <div className="relative h-64 w-full overflow-hidden">
+          {items.map((p, i) => (
+            <div key={i} className="bg-white rounded-2xl shadow-xl overflow-hidden hover:shadow-2xl transition-shadow duration-300 group flex flex-col h-full">
+              <div className="relative h-96 w-full overflow-hidden bg-white p-6">
                 <Image
                   src={p.img}
                   alt={p.title}
                   fill
-                  className="object-cover transition-transform duration-500 group-hover:scale-110"
+                  className="object-contain transition-transform duration-500 group-hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, 33vw"
+                  onError={(e) => { e.target.src = 'https://via.placeholder.com/400?text=No+Image' }}
                 />
               </div>
-              <div className="p-8">
-                <div className="flex justify-between items-start mb-2">
-                  <h3 className="font-bold text-xl text-gray-900">{p.title}</h3>
-                  <span className="bg-cyan-100 text-cyan-800 text-xs font-bold px-2 py-1 rounded-full">Top Ventas</span>
+              <div className="p-8 flex-1 flex flex-col bg-white">
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="font-bold text-xl text-gray-900 leading-tight">{p.title}</h3>
+                  <span className="bg-cyan-50 text-cyan-700 text-[10px] font-bold px-2 py-1 rounded-full whitespace-nowrap border border-cyan-100 uppercase tracking-wide">Top Ventas</span>
                 </div>
-                <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+                <p className="text-gray-500 text-sm leading-relaxed">
                   {p.desc}
                 </p>
-                <div className="flex items-center justify-between mt-auto">
-                  <span className="text-2xl font-bold text-gray-900">{p.price}</span>
-                  <a href="#contact" className="bg-gray-900 text-white px-5 py-2 rounded-lg text-sm font-semibold hover:bg-cyan-600 transition-colors">
-                    Lo quiero
-                  </a>
-                </div>
               </div>
             </div>
           ))}

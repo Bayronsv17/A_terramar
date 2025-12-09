@@ -35,6 +35,9 @@ const nextConfig = {
   productionBrowserSourceMaps: false,
   // Cambiar carpeta de salida para evitar problemas de permisos en `.next`
   distDir: 'build',
+  images: {
+    domains: ['res.cloudinary.com', 'via.placeholder.com'],
+  },
   async headers() {
     const csp = {
       key: 'Content-Security-Policy',

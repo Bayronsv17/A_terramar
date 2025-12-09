@@ -1,32 +1,24 @@
 import { useState, useEffect } from 'react'
 
-const testimonials = [
-  {
-    name: 'María Pérez',
-    role: 'Cliente Satisfecha',
-    quote: 'Desde que uso el Óleo Facial mi piel ha cambiado por completo. ¡Me encanta la luminosidad que tiene ahora!',
-  },
-  {
-    name: 'Claudia Ruiz',
-    role: 'Cliente Satisfecha',
-    quote: 'La oportunidad de negocio con Terramar es real. He logrado metas financieras que antes veía imposibles.',
-  },
-  {
-    name: 'Leticia R.',
-    role: 'Cliente Satisfecha',
-    quote: 'Los productos se venden solos por su calidad. Bety es una líder increíble que siempre nos apoya.',
-  },
-]
-
-export default function Testimonials() {
+export default function Testimonials({ testimonials }) {
   const [current, setCurrent] = useState(0)
 
+  // Use passed testimonials or empty array.
+  const displayTestimonials = testimonials || []
+
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % testimonials.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
+    if (displayTestimonials.length > 1) {
+      const timer = setInterval(() => {
+        setCurrent((prev) => (prev + 1) % displayTestimonials.length)
+      }, 5000)
+      return () => clearInterval(timer)
+    }
+  }, [displayTestimonials.length])
+
+  // If no testimonials, hide the section
+  if (!displayTestimonials || displayTestimonials.length === 0) {
+    return null
+  }
 
   return (
     <section className="py-20 bg-gradient-to-b from-white to-gray-50 overflow-hidden">
@@ -41,7 +33,7 @@ export default function Testimonials() {
               className="flex transition-transform duration-700 ease-in-out"
               style={{ transform: `translateX(-${current * 100}%)` }}
             >
-              {testimonials.map((t, index) => (
+              {displayTestimonials.map((t, index) => (
                 <div key={index} className="w-full flex-shrink-0 px-4">
                   <div className="bg-white rounded-3xl shadow-xl p-8 md:p-12 border border-gray-100 relative mx-auto max-w-2xl transform hover:scale-[1.02] transition-transform duration-300">
                     {/* Comillas decorativas */}
@@ -70,7 +62,7 @@ export default function Testimonials() {
 
           {/* Indicadores (Puntos) */}
           <div className="flex justify-center gap-3 mt-8">
-            {testimonials.map((_, idx) => (
+            {displayTestimonials.length > 1 && displayTestimonials.map((_, idx) => (
               <button
                 key={idx}
                 onClick={() => setCurrent(idx)}

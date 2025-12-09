@@ -1,19 +1,20 @@
 import { useState } from 'react'
 
-const VIDEOS = [
-  { id: 'dQw4w9WgXcQ', title: 'Rutina de Skincare Diaria', duration: '4:20' },
-  { id: '3JZ_D3ELwOQ', title: 'Oportunidad de Negocio Terramar', duration: '5:15' },
-  { id: 'L_jWHffIx5E', title: 'Maquillaje Natural en 5 Minutos', duration: '3:45' },
-]
-
-export default function VideoCarousel() {
+export default function VideoCarousel({ videos }) {
   const [index, setIndex] = useState(0)
 
+  const displayVideos = videos || []
+
   function prev() {
-    setIndex((i) => (i - 1 + VIDEOS.length) % VIDEOS.length)
+    setIndex((i) => (i - 1 + displayVideos.length) % displayVideos.length)
   }
   function next() {
-    setIndex((i) => (i + 1) % VIDEOS.length)
+    setIndex((i) => (i + 1) % displayVideos.length)
+  }
+
+  // Hide section if no videos
+  if (!displayVideos || displayVideos.length === 0) {
+    return null
   }
 
   return (
@@ -30,9 +31,9 @@ export default function VideoCarousel() {
         <div className="relative max-w-4xl mx-auto">
           {/* Main Video Container */}
           <div className="overflow-hidden rounded-2xl shadow-2xl bg-black aspect-video relative group">
-            {VIDEOS.map((v, i) => (
+            {displayVideos.map((v, i) => (
               <div
-                key={v.id}
+                key={v.id || i}
                 className={`absolute inset-0 w-full h-full transition-opacity duration-500 ${i === index ? 'opacity-100 z-10' : 'opacity-0 z-0'
                   }`}
               >
@@ -50,31 +51,35 @@ export default function VideoCarousel() {
             ))}
 
             {/* Navigation Arrows (Absolute over video) */}
-            <button
-              onClick={prev}
-              className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/90 hover:text-cyan-700 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110"
-              aria-label="Anterior"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
-              </svg>
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/90 hover:text-cyan-700 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110"
-              aria-label="Siguiente"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-              </svg>
-            </button>
+            {displayVideos.length > 1 && (
+              <>
+                <button
+                  onClick={prev}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/90 hover:text-cyan-700 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110"
+                  aria-label="Anterior"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                </button>
+                <button
+                  onClick={next}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 z-20 bg-white/20 hover:bg-white/90 hover:text-cyan-700 text-white p-3 rounded-full backdrop-blur-sm transition-all duration-300 transform hover:scale-110"
+                  aria-label="Siguiente"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2.5} stroke="currentColor" className="w-6 h-6">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                  </svg>
+                </button>
+              </>
+            )}
           </div>
 
           {/* Thumbnails / Indicators */}
           <div className="flex justify-center gap-4 mt-8">
-            {VIDEOS.map((v, i) => (
+            {displayVideos.map((v, i) => (
               <button
-                key={v.id}
+                key={v.id || i}
                 onClick={() => setIndex(i)}
                 className={`relative overflow-hidden rounded-lg transition-all duration-300 border-2 ${i === index
                   ? 'w-24 h-16 border-cyan-500 ring-2 ring-cyan-200 ring-offset-2'

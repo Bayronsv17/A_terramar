@@ -1,15 +1,19 @@
 import Head from 'next/head'
 import Navbar from '../components/Navbar'
 import Hero from '../components/Hero'
-// Features removed - replaced by VideoCarousel
 import VideoCarousel from '../components/VideoCarousel'
 import Highlights from '../components/Highlights'
 import Testimonials from '../components/Testimonials'
 import ContactForm from '../components/ContactForm'
 import WhatsAppButton from '../components/WhatsAppButton'
 import Footer from '../components/Footer'
+import dbConnect from '../lib/dbConnect'
+import Setting from '../models/Setting'
 
-export default function Home() {
+export default function Home({ cmsData }) {
+  // Determine highlights (either from CMS or undefined fallback handled in component)
+  const highlights = cmsData?.home_highlights
+
   return (
     <>
       <Head>
@@ -21,9 +25,9 @@ export default function Home() {
         <Navbar />
         <main className="flex-1">
           <Hero />
-          <Highlights />
-          <VideoCarousel />
-          <Testimonials />
+          <Highlights products={highlights} />
+          <VideoCarousel videos={cmsData?.home_videos} />
+          <Testimonials testimonials={cmsData?.home_testimonials} />
           <ContactForm />
         </main>
         <Footer />
@@ -31,4 +35,28 @@ export default function Home() {
       </div>
     </>
   )
+}
+
+export async function getServerSideProps() {
+  try {
+    await dbConnect()
+    const allSettings = await Setting.find({})
+    const cmsData = allSettings.reduce((acc, curr) => {
+      acc[curr.key] = curr.value
+      return acc
+    }, {})
+
+    return {
+      props: {
+        cmsData: JSON.parse(JSON.stringify(cmsData))
+      }
+    }
+  } catch (e) {
+    console.error("Error loading settings", e)
+    return {
+      props: {
+        cmsData: {}
+      }
+    }
+  }
 }
