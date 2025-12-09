@@ -34,7 +34,7 @@ const nextConfig = {
   swcMinify: true,
   productionBrowserSourceMaps: false,
   // Cambiar carpeta de salida para evitar problemas de permisos en `.next`
-  distDir: 'build',
+  // distDir: 'build',
   images: {
     domains: ['res.cloudinary.com', 'via.placeholder.com'],
   },
