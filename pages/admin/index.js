@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import { useRouter } from 'next/router'
@@ -57,9 +57,9 @@ export default function AdminDashboard() {
             fetchOrders()
             fetchSettings()
         }
-    }, [])
+    }, [fetchOrders, fetchSettings])
 
-    const fetchOrders = async () => {
+    const fetchOrders = useCallback(async () => {
         setLoading(true)
         try {
             const res = await fetch('/api/orders')
@@ -72,9 +72,9 @@ export default function AdminDashboard() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [])
 
-    const fetchSettings = async () => {
+    const fetchSettings = useCallback(async () => {
         try {
             const res = await fetch('/api/settings?key=catalogName')
             const data = await res.json()
@@ -84,7 +84,7 @@ export default function AdminDashboard() {
         } catch (error) {
             console.error('Error fetching settings:', error)
         }
-    }
+    }, [])
 
     const handleStatusChange = async (orderId, newStatus) => {
         try {
