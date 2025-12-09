@@ -14,6 +14,30 @@ export default function SessionTimeout() {
     const logoutTimer = useRef(null)
 
     // Check if user is logged in
+    const clearTimers = useCallback(() => {
+        if (warningTimer.current) clearTimeout(warningTimer.current)
+        if (logoutTimer.current) clearTimeout(logoutTimer.current)
+    }, [])
+
+    const performLogout = useCallback(() => {
+        localStorage.removeItem('user')
+        setShowWarning(false)
+        setLoggedIn(false)
+        // Force hard reload to clear screen immediately
+        window.location.href = '/login'
+    }, [])
+
+    const startTimers = useCallback(() => {
+        clearTimers()
+        warningTimer.current = setTimeout(() => {
+            setShowWarning(true)
+        }, WARNING_MS)
+
+        logoutTimer.current = setTimeout(() => {
+            performLogout()
+        }, TIMEOUT_MS)
+    }, [clearTimers, performLogout])
+
     const checkLogin = useCallback(() => {
         const user = localStorage.getItem('user')
         if (user) {
@@ -23,42 +47,18 @@ export default function SessionTimeout() {
             setLoggedIn(false)
             clearTimers()
         }
-    }, [])
+    }, [startTimers, clearTimers])
 
-    const clearTimers = () => {
-        if (warningTimer.current) clearTimeout(warningTimer.current)
-        if (logoutTimer.current) clearTimeout(logoutTimer.current)
-    }
-
-    const startTimers = () => {
-        clearTimers()
-        warningTimer.current = setTimeout(() => {
-            setShowWarning(true)
-        }, WARNING_MS)
-
-        logoutTimer.current = setTimeout(() => {
-            performLogout()
-        }, TIMEOUT_MS)
-    }
-
-    const resetTimers = () => {
+    const resetTimers = useCallback(() => {
         if (showWarning) return // Don't reset if warning is already showing (wait for user action)
         if (!loggedIn) return
         startTimers()
-    }
+    }, [showWarning, loggedIn, startTimers])
 
-    const performLogout = () => {
-        localStorage.removeItem('user')
-        setShowWarning(false)
-        setLoggedIn(false)
-        // Force hard reload to clear screen immediately
-        window.location.href = '/login'
-    }
-
-    const extendSession = () => {
+    const extendSession = useCallback(() => {
         setShowWarning(false)
         startTimers()
-    }
+    }, [startTimers])
 
     // Monitor Activity
     useEffect(() => {
@@ -75,7 +75,7 @@ export default function SessionTimeout() {
             events.forEach(event => window.removeEventListener(event, handleActivity))
             clearTimers()
         }
-    }, [checkLogin, loggedIn, showWarning]) // Re-bind if login state changes
+    }, [checkLogin, resetTimers, clearTimers]) // Re-bind if login state changes
 
     // Watch for route changes (navigating counts as activity)
     useEffect(() => {
@@ -85,7 +85,7 @@ export default function SessionTimeout() {
         }
         router.events.on('routeChangeComplete', handleRouteChange)
         return () => router.events.off('routeChangeComplete', handleRouteChange)
-    }, [router, checkLogin])
+    }, [router, checkLogin, resetTimers])
 
     if (!showWarning) return null
 

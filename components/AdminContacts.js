@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '../lib/ToastContext'
 
 export default function AdminContacts() {
@@ -8,9 +8,9 @@ export default function AdminContacts() {
 
     useEffect(() => {
         fetchContacts()
-    }, [])
+    }, [fetchContacts])
 
-    const fetchContacts = async () => {
+    const fetchContacts = useCallback(async () => {
         setLoading(true)
         try {
             const res = await fetch('/api/admin/contacts')
@@ -24,7 +24,7 @@ export default function AdminContacts() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [addToast])
 
     const deleteContact = async (id) => {
         if (!confirm('¿Estás seguro de eliminar este registro?')) return
@@ -158,8 +158,8 @@ Fecha Registro: ${new Date(c.createdAt).toLocaleDateString()} ${new Date(c.creat
                                                 value={c.status}
                                                 onChange={(e) => updateStatus(c._id, e.target.value)}
                                                 className={`text-xs font-bold px-2 py-1 rounded-full border-0 cursor-pointer ${c.status === 'new' ? 'bg-green-100 text-green-800' :
-                                                        c.status === 'contacted' ? 'bg-blue-100 text-blue-800' :
-                                                            'bg-gray-100 text-gray-800'
+                                                    c.status === 'contacted' ? 'bg-blue-100 text-blue-800' :
+                                                        'bg-gray-100 text-gray-800'
                                                     }`}
                                             >
                                                 <option value="new">NUEVO</option>

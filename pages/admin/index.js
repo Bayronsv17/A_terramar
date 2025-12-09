@@ -88,7 +88,7 @@ export default function AdminDashboard() {
             fetchOrders()
             fetchSettings()
         }
-    }, [fetchOrders, fetchSettings])
+    }, [router, fetchOrders, fetchSettings])
 
     const handleStatusChange = async (orderId, newStatus) => {
         try {
@@ -757,7 +757,7 @@ export default function AdminDashboard() {
                                     <form onSubmit={handleUpdateSettings} className="space-y-6">
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-1">Nombre del Catálogo Actual</label>
-                                            <p className="text-xs text-gray-400 mb-2">Este nombre aparecerá en los nuevos pedidos para identificar la vigencia de los precios (ej. "Diciembre 2025").</p>
+                                            <p className="text-xs text-gray-400 mb-2">Este nombre aparecerá en los nuevos pedidos para identificar la vigencia de los precios (ej. &quot;Diciembre 2025&quot;).</p>
                                             <input
                                                 type="text"
                                                 className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none transition-all"
@@ -906,6 +906,7 @@ export default function AdminDashboard() {
                                                     {/* Left: Image Preview */}
                                                     <div className="w-full md:w-64 flex-shrink-0">
                                                         <div className="aspect-square bg-gray-100 rounded-lg shadow-inner overflow-hidden border border-gray-200 relative group">
+                                                            {/* eslint-disable-next-line @next/next/no-img-element */}
                                                             <img
                                                                 src={priceForm.image || searchedProduct.image || 'https://via.placeholder.com/150'}
                                                                 alt={searchedProduct.name}

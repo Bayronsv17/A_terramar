@@ -44,6 +44,7 @@ export default function ProductImage({ product }) {
         return (
             <div className="w-full h-full flex flex-col items-center justify-center bg-gray-50 rounded-lg p-4 opacity-50">
                 {/* Fallback to a generic brand icon or logo */}
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                     src="/assets/logo.svg"
                     alt="Terramar"
@@ -55,6 +56,7 @@ export default function ProductImage({ product }) {
     }
 
     return (
+        /* eslint-disable-next-line @next/next/no-img-element */
         <img
             src={getUrl(imageState)}
             alt={product.name}

@@ -137,18 +137,18 @@ export default function Navbar() {
         </div>
 
         <nav className="hidden md:flex items-center space-x-8">
-          <a href="/#home" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Inicio</a>
-          <a href="/#products" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Productos</a>
-          <a href="/#contact" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Contacto</a>
+          <Link href="/#home" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Inicio</Link>
+          <Link href="/#products" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Productos</Link>
+          <Link href="/#contact" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Contacto</Link>
         </nav>
 
         <div>
-          <a
+          <Link
             href="/login"
             className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-6 py-2.5 rounded-full font-bold shadow-lg hover:shadow-cyan-500/30 transition-all transform hover:-translate-y-0.5 text-sm"
           >
             Ordenar Productos
-          </a>
+          </Link>
         </div>
       </div>
     </header>

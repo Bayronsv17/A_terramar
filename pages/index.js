@@ -5,7 +5,7 @@ import VideoCarousel from '../components/VideoCarousel'
 import Highlights from '../components/Highlights'
 import Testimonials from '../components/Testimonials'
 import ContactForm from '../components/ContactForm'
-import WhatsAppButton from '../components/WhatsAppButton'
+
 import Footer from '../components/Footer'
 import dbConnect from '../lib/dbConnect'
 import Setting from '../models/Setting'
@@ -31,7 +31,7 @@ export default function Home({ cmsData }) {
           <ContactForm />
         </main>
         <Footer />
-        <WhatsAppButton />
+
       </div>
     </>
   )

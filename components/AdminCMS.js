@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '../lib/ToastContext'
 
 export default function AdminCMS() {
@@ -17,9 +17,9 @@ export default function AdminCMS() {
 
     useEffect(() => {
         fetchSettings()
-    }, [])
+    }, [fetchSettings])
 
-    const fetchSettings = async () => {
+    const fetchSettings = useCallback(async () => {
         setLoading(true)
         try {
             const res = await fetch('/api/settings')
@@ -35,7 +35,7 @@ export default function AdminCMS() {
         } finally {
             setLoading(false)
         }
-    }
+    }, [addToast])
 
     const saveSection = async (key, value) => {
         setLoading(true)
@@ -137,6 +137,7 @@ export default function AdminCMS() {
                                     <label className="block text-xs font-bold text-gray-700 mb-1">URL Imagen</label>
                                     <input type="text" value={item.img} onChange={e => updateHighlight(idx, 'img', e.target.value)} className="w-full p-2 border rounded text-sm mb-2" />
                                     <div className="bg-white border rounded h-32 flex items-center justify-center overflow-hidden relative">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
                                         {item.img ? <img src={item.img} alt="" className="h-full object-contain" onError={e => e.target.style.display = 'none'} /> : <span className="text-gray-300 text-xs">Sin imagen</span>}
                                     </div>
                                 </div>
@@ -178,6 +179,7 @@ export default function AdminCMS() {
                                         className="w-full p-2 border rounded text-sm"
                                     />
                                     <div className="w-32 bg-black rounded overflow-hidden aspect-video flex-shrink-0 relative">
+                                        {/* eslint-disable-next-line @next/next/no-img-element */}
                                         {video.id && <img src={`https://img.youtube.com/vi/${video.id}/mqdefault.jpg`} alt="" className="w-full h-full object-cover opacity-80" />}
                                     </div>
                                 </div>

@@ -20,7 +20,7 @@ export default function Login() {
         localStorage.removeItem('role')
         localStorage.removeItem('admin_auth')
         logoutUser()
-    }, [])
+    }, [logoutUser])
 
     const handleLogin = async (e) => {
         e.preventDefault()
