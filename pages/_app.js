@@ -20,6 +20,8 @@ function loadGA(id) {
 import { CartProvider } from '../lib/CartContext'
 import { ToastProvider } from '../lib/ToastContext'
 
+import SessionTimeout from '../components/SessionTimeout'
+
 export default function MyApp({ Component, pageProps }) {
   const gaId = process.env.NEXT_PUBLIC_GOOGLE_ANALYTICS_ID
 
@@ -40,6 +42,7 @@ export default function MyApp({ Component, pageProps }) {
     <CartProvider>
       <ToastProvider>
         <Component {...pageProps} />
+        <SessionTimeout />
         <CookieConsent onAccept={onAccept} />
       </ToastProvider>
     </CartProvider>

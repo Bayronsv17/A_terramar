@@ -10,6 +10,7 @@ export default function Productos() {
     const [products, setProducts] = useState([])
     const [loading, setLoading] = useState(true)
     const [selectedCategory, setSelectedCategory] = useState('Todas')
+    const [categories, setCategories] = useState(['Todas'])
     const [searchKey, setSearchKey] = useState('')
     const { cart, addToCart, removeFromCart } = useCart()
     const router = useRouter()
@@ -18,10 +19,45 @@ export default function Productos() {
     const [userRegion, setUserRegion] = useState('MX')
     const [catalogName, setCatalogName] = useState('')
 
+    // Pagination State
+    const [currentPage, setCurrentPage] = useState(1)
+    const [totalPages, setTotalPages] = useState(1)
+
+    // Fetch Products with Pagination and Filters
+    const fetchProducts = useCallback(() => {
+        setLoading(true)
+        const params = new URLSearchParams({
+            page: currentPage,
+            limit: 20, // 20 items per page
+            category: selectedCategory !== 'Todas' ? selectedCategory : '',
+            region: userRegion
+        })
+
+        fetch(`/api/products?${params.toString()}`)
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.success) {
+                    setProducts(data.data)
+                    // Update metadata
+                    if (data.pagination) {
+                        setTotalPages(data.pagination.totalPages)
+                    }
+                    // Update categories only if initially provided
+                    if (data.categories) {
+                        setCategories(data.categories)
+                    }
+                }
+                setLoading(false)
+            })
+            .catch(err => {
+                console.error(err)
+                setLoading(false)
+            })
+    }, [currentPage, selectedCategory, userRegion])
+
+    // Initial Setup
     useEffect(() => {
         let currentRegion = 'MX'
-
-        // Get user region from localStorage if logged in
         const userStr = localStorage.getItem('user')
         if (userStr) {
             try {
@@ -35,17 +71,7 @@ export default function Productos() {
             }
         }
 
-        // Fetch products
-        fetch('/api/products')
-            .then((res) => res.json())
-            .then((data) => {
-                if (data.success) {
-                    setProducts(data.data)
-                }
-                setLoading(false)
-            })
-
-        // Fetch settings (catalog name)
+        // Fetch settings
         fetch('/api/settings')
             .then((res) => res.json())
             .then((data) => {
@@ -53,32 +79,12 @@ export default function Productos() {
                     setCatalogName(data.data.currentCatalogName || 'General')
                 }
             })
-            .catch(err => console.error(err))
     }, [])
 
-    // Memoize categories to prevent recalculation on every render
-    const categories = useMemo(() => {
-        return ['Todas', ...new Set(products.map(p => p.category).filter(Boolean))]
-    }, [products])
-
-    // Memoize filtered products
-    const filteredProducts = useMemo(() => {
-        let result = products
-
-        // Filter by Visibility
-        result = result.filter(p => {
-            if (userRegion === 'MX') return p.isVisibleMX !== false
-            if (userRegion === 'US') return p.isVisibleUS !== false
-            return true
-        })
-
-        // Filter by Category
-        if (selectedCategory !== 'Todas') {
-            result = result.filter(p => p.category === selectedCategory)
-        }
-
-        return result
-    }, [selectedCategory, products, userRegion])
+    // Trigger fetch when params change
+    useEffect(() => {
+        fetchProducts()
+    }, [fetchProducts])
 
     // Memoize total items calculation
     const totalItems = useMemo(() => {
@@ -90,13 +96,36 @@ export default function Productos() {
         return Object.values(cart).reduce((acc, item) => acc + (item.price * item.quantity), 0).toFixed(2)
     }, [cart])
 
-    const handleAddByKey = useCallback((e) => {
+    const handleCategoryChange = (cat) => {
+        setSelectedCategory(cat)
+        setCurrentPage(1)
+        window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+
+    const handleAddByKey = useCallback(async (e) => {
         e.preventDefault()
         const qtyInput = document.getElementById('qty-key-input')
         const quantity = qtyInput ? parseInt(qtyInput.value) : 1
+        const key = searchKey.trim()
 
-        // Case insensitive search
-        const product = products.find(p => p.key.toLowerCase() === searchKey.trim().toLowerCase())
+        if (!key) return
+
+        // 1. Try Local Search (Current Page)
+        let product = products.find(p => p.key.toLowerCase() === key.toLowerCase())
+
+        // 2. If not found, Try API Search (Server)
+        if (!product) {
+            try {
+                // We use the API to find the product regardless of pagination
+                const res = await fetch(`/api/products?key=${key}&region=${userRegion}`)
+                const data = await res.json()
+                if (data.success && data.data && data.data.length > 0) {
+                    product = data.data[0]
+                }
+            } catch (err) {
+                console.error('Error fetching product by key:', err)
+            }
+        }
 
         if (product) {
             for (let i = 0; i < quantity; i++) {
@@ -108,7 +137,7 @@ export default function Productos() {
         } else {
             addToast('Producto no encontrado', 'error')
         }
-    }, [products, searchKey, addToCart, addToast])
+    }, [products, searchKey, userRegion, addToCart, addToast])
 
     // Handlers for ProductCard
     const handleAdd = useCallback((product) => {
@@ -188,7 +217,7 @@ export default function Productos() {
                                 {categories.map(cat => (
                                     <li key={cat} className="flex-shrink-0">
                                         <button
-                                            onClick={() => setSelectedCategory(cat)}
+                                            onClick={() => handleCategoryChange(cat)}
                                             className={`px-4 py-1.5 lg:px-3 lg:py-2 rounded-full lg:rounded text-xs lg:text-sm transition-all whitespace-nowrap w-full text-left border lg:border-none ${selectedCategory === cat
                                                 ? 'bg-blue-900 text-white border-blue-900 font-bold shadow-md'
                                                 : 'bg-white text-gray-500 border-gray-200 hover:bg-gray-50'
@@ -209,41 +238,74 @@ export default function Productos() {
                                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-cyan-600"></div>
                             </div>
                         ) : (
-                            <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
-                                {filteredProducts.map((product) => (
-                                    <ProductCard
-                                        key={product._id || product.key}
-                                        product={product}
-                                        region={userRegion}
-                                        quantity={cart[product._id || product.key]?.quantity || 0}
-                                        onAdd={handleAdd}
-                                        onRemove={handleRemove}
-                                    />
-                                ))}
-                            </div>
+                            <>
+                                <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-3 md:gap-6">
+                                    {products.map((product) => (
+                                        <ProductCard
+                                            key={product._id || product.key}
+                                            product={product}
+                                            region={userRegion}
+                                            quantity={cart[product._id || product.key]?.quantity || 0}
+                                            onAdd={handleAdd}
+                                            onRemove={handleRemove}
+                                        />
+                                    ))}
+                                </div>
+
+                                {/* Pagination */}
+                                {totalPages > 1 && (
+                                    <div className="flex justify-center gap-4 mt-8 pb-8">
+                                        <button
+                                            onClick={() => {
+                                                setCurrentPage(p => Math.max(1, p - 1))
+                                                window.scrollTo({ top: 0, behavior: 'smooth' })
+                                            }}
+                                            disabled={currentPage === 1}
+                                            className="px-4 py-2 rounded bg-white border border-gray-200 text-gray-700 disabled:opacity-50 hover:bg-gray-50 font-medium transition-colors"
+                                        >
+                                            Anterior
+                                        </button>
+                                        <span className="flex items-center px-4 font-bold text-gray-600">
+                                            Página {currentPage} de {totalPages}
+                                        </span>
+                                        <button
+                                            onClick={() => {
+                                                setCurrentPage(p => Math.min(totalPages, p + 1))
+                                                window.scrollTo({ top: 0, behavior: 'smooth' })
+                                            }}
+                                            disabled={currentPage === totalPages}
+                                            className="px-4 py-2 rounded bg-white border border-gray-200 text-gray-700 disabled:opacity-50 hover:bg-gray-50 font-medium transition-colors"
+                                        >
+                                            Siguiente
+                                        </button>
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                 </div>
 
                 {/* Sticky Bottom Cart Bar */}
-                {totalItems > 0 && (
-                    <div className="fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-gray-100 p-4 z-50 animate-fade-in-up">
-                        <div className="container mx-auto max-w-4xl flex justify-between items-center">
-                            <div className="flex flex-col">
-                                <span className="text-gray-500 text-xs font-medium">{totalItems} ARTÍCULOS</span>
-                                <span className="text-blue-900 font-bold text-xl">Total: ${cartTotal}</span>
+                {
+                    totalItems > 0 && (
+                        <div className="fixed bottom-0 left-0 w-full bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.1)] border-t border-gray-100 p-4 z-50 animate-fade-in-up">
+                            <div className="container mx-auto max-w-4xl flex justify-between items-center">
+                                <div className="flex flex-col">
+                                    <span className="text-gray-500 text-xs font-medium">{totalItems} ARTÍCULOS</span>
+                                    <span className="text-blue-900 font-bold text-xl">Total: ${cartTotal}</span>
+                                </div>
+                                <button
+                                    onClick={() => router.push('/carrito')}
+                                    className="bg-cyan-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-cyan-700 transform active:scale-95 transition-all flex items-center gap-2"
+                                >
+                                    <span>🛒</span> Ver Carrito
+                                </button>
                             </div>
-                            <button
-                                onClick={() => router.push('/carrito')}
-                                className="bg-cyan-600 text-white font-bold py-3 px-8 rounded-full shadow-lg hover:bg-cyan-700 transform active:scale-95 transition-all flex items-center gap-2"
-                            >
-                                <span>🛒</span> Ver Carrito
-                            </button>
                         </div>
-                    </div>
-                )}
-            </main>
+                    )
+                }
+            </main >
             <Footer />
-        </div>
+        </div >
     )
 }
