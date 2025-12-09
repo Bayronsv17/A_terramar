@@ -117,6 +117,7 @@ export default function Productos() {
         if (!product) {
             try {
                 // We use the API to find the product regardless of pagination
+                // Also ensures we get the fresh object with prices
                 const res = await fetch(`/api/products?key=${key}&region=${userRegion}`)
                 const data = await res.json()
                 if (data.success && data.data && data.data.length > 0) {
@@ -128,8 +129,34 @@ export default function Productos() {
         }
 
         if (product) {
+            // RESOLVE PRICE AND VISIBILITY BASED ON REGION
+            let finalPrice = product.price
+            let finalOriginalPrice = product.originalPrice
+
+            // If US Region
+            if (userRegion === 'US') {
+                if (product.prices && product.prices.US && product.prices.US.price) {
+                    finalPrice = product.prices.US.price
+                    finalOriginalPrice = product.prices.US.originalPrice
+                }
+                // If not visible in US, maybe warn? But allow for now if admin allows.
+            }
+            // If MX Region
+            else if (userRegion === 'MX') {
+                if (product.prices && product.prices.MX && product.prices.MX.price) {
+                    finalPrice = product.prices.MX.price
+                    finalOriginalPrice = product.prices.MX.originalPrice
+                }
+            }
+
+            const productToAdd = {
+                ...product,
+                price: finalPrice,
+                originalPrice: finalOriginalPrice
+            }
+
             for (let i = 0; i < quantity; i++) {
-                addToCart(product)
+                addToCart(productToAdd)
             }
             addToast(`Agregado: ${product.name} (${quantity})`, 'success')
             setSearchKey('')
