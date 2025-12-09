@@ -55,7 +55,12 @@ export default function AdminDashboard() {
     const fetchOrders = useCallback(async () => {
         setLoading(true)
         try {
-            const res = await fetch('/api/orders')
+            const token = localStorage.getItem('token')
+            const res = await fetch('/api/orders', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
             const data = await res.json()
             if (data.success) {
                 setOrders(data.data)
@@ -82,19 +87,23 @@ export default function AdminDashboard() {
     useEffect(() => {
         const token = localStorage.getItem('token')
         if (!token) {
-            router.push('/login')
+            window.location.href = '/login'
         } else {
             setIsAuthenticated(true)
             fetchOrders()
             fetchSettings()
         }
-    }, [router, fetchOrders, fetchSettings])
+    }, [fetchOrders, fetchSettings])
 
     const handleStatusChange = async (orderId, newStatus) => {
         try {
+            const token = localStorage.getItem('token')
             const res = await fetch('/api/orders', {
                 method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ id: orderId, status: newStatus })
             })
             const data = await res.json()
@@ -111,9 +120,13 @@ export default function AdminDashboard() {
         e.preventDefault()
         setLoading(true)
         try {
+            const token = localStorage.getItem('token')
             const res = await fetch('/api/settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ key: 'catalogName', value: catalogName })
             })
             const data = await res.json()
@@ -294,9 +307,13 @@ export default function AdminDashboard() {
         e.preventDefault()
         setLoading(true)
         try {
+            const token = localStorage.getItem('token')
             const res = await fetch('/api/products', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify(newProduct)
             })
             const data = await res.json()
@@ -350,8 +367,12 @@ export default function AdminDashboard() {
 
         setLoading(true)
         try {
+            const token = localStorage.getItem('token')
             const res = await fetch(`/api/products?id=${searchedProduct._id}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
             })
             const data = await res.json()
             if (data.success) {

@@ -22,7 +22,12 @@ export default function AdminCMS() {
     const fetchSettings = useCallback(async () => {
         setLoading(true)
         try {
-            const res = await fetch('/api/settings')
+            const token = localStorage.getItem('token')
+            const res = await fetch('/api/settings', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
             const data = await res.json()
             if (data.success && data.data) {
                 if (data.data.home_highlights) setHighlights(data.data.home_highlights)
@@ -40,9 +45,13 @@ export default function AdminCMS() {
     const saveSection = async (key, value) => {
         setLoading(true)
         try {
+            const token = localStorage.getItem('token')
             const res = await fetch('/api/settings', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ key, value })
             })
             const data = await res.json()

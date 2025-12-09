@@ -1,5 +1,6 @@
 import dbConnect from '../../../lib/dbConnect'
 import Product from '../../../models/Product'
+import { verifyAdmin } from '../../../lib/auth'
 
 export default async function handler(req, res) {
     const { method } = req
@@ -69,14 +70,17 @@ export default async function handler(req, res) {
             break
         case 'POST':
             try {
+                verifyAdmin(req) // PROTECTED
                 const product = await Product.create(req.body) /* create a new model in the database */
                 res.status(201).json({ success: true, data: product })
             } catch (error) {
-                res.status(400).json({ success: false, error: error.message })
+                const s = error.message.includes('No autorizado') ? 401 : 400
+                res.status(s).json({ success: false, error: error.message })
             }
             break
         case 'DELETE':
             try {
+                verifyAdmin(req) // PROTECTED
                 const { id } = req.query
                 if (!id) {
                     return res.status(400).json({ success: false, message: 'Product ID is required' })
@@ -87,7 +91,8 @@ export default async function handler(req, res) {
                 }
                 res.status(200).json({ success: true, data: deletedProduct })
             } catch (error) {
-                res.status(400).json({ success: false, error: error.message })
+                const s = error.message.includes('No autorizado') ? 401 : 400
+                res.status(s).json({ success: false, error: error.message })
             }
             break
         default:

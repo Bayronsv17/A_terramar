@@ -14,12 +14,12 @@ export default function Login() {
     const { loginUser, logoutUser } = useCart()
 
     useEffect(() => {
-        // Force logout on visiting login page
-        localStorage.removeItem('token')
-        localStorage.removeItem('user')
-        localStorage.removeItem('role')
-        localStorage.removeItem('admin_auth')
-        logoutUser()
+        // Force logout on visiting login page - DISABLED FOR DEBUGGING
+        // localStorage.removeItem('token')
+        // localStorage.removeItem('user')
+        // localStorage.removeItem('role')
+        // localStorage.removeItem('admin_auth')
+        // logoutUser()
     }, [logoutUser])
 
     const handleLogin = async (e) => {
@@ -44,14 +44,18 @@ export default function Login() {
                 // Reset admin auth logic from previous version
                 if (data.user.role === 'admin') {
                     localStorage.setItem('admin_auth', 'true')
-                    router.push('/admin')
+                    window.location.href = '/admin'
                 } else {
-                    router.push('/productos')
+                    window.location.href = '/productos'
                 }
             } else {
-                setError(data.message || 'Error al iniciar sesión')
+                const msg = data.message || 'Error al iniciar sesión'
+                alert('Error de login: ' + msg) // Explicit alert for user
+                setError(msg)
             }
         } catch (err) {
+            console.error(err)
+            alert('Error de conexión: ' + err.message)
             setError('Error de conexión')
         } finally {
             setLoading(false)

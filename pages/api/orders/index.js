@@ -2,6 +2,7 @@ import dbConnect from '../../../lib/dbConnect'
 import Order from '../../../models/Order'
 import Setting from '../../../models/Setting'
 import Product from '../../../models/Product'
+import { verifyAdmin } from '../../../lib/auth'
 
 export default async function handler(req, res) {
     const { method } = req
@@ -16,16 +17,19 @@ export default async function handler(req, res) {
                 let orders
                 if (clientName) {
                     // Client view: specific client, full history
+                    // Open for now (or could verify token matches name but simple approach is ok for reading own by name locally stored)
                     orders = await Order.find({ clientName }).populate('items.product').sort({ createdAt: -1 })
                 } else {
-                    // Admin view: all orders, limit to 50 for performance
+                    // Admin view: all orders - PROTECT THIS
+                    verifyAdmin(req)
                     orders = await Order.find({}).populate('items.product').sort({ createdAt: -1 }).limit(50)
                 }
 
                 res.status(200).json({ success: true, data: orders })
             } catch (error) {
                 console.error('API Orders GET Error:', error)
-                res.status(400).json({ success: false, error: error.message })
+                const s = error.message.includes('No autorizado') ? 401 : 400
+                res.status(s).json({ success: false, error: error.message })
             }
             break
 
@@ -56,6 +60,7 @@ export default async function handler(req, res) {
 
         case 'PUT':
             try {
+                verifyAdmin(req) // PROTECTED
                 const { orderId, status } = req.body
                 if (!orderId || !status) {
                     return res.status(400).json({ success: false, error: 'Faltan datos (orderId o status)' })
@@ -71,7 +76,8 @@ export default async function handler(req, res) {
                 res.status(200).json({ success: true, data: updatedOrder })
             } catch (error) {
                 console.error('API Orders PUT Error:', error)
-                res.status(400).json({ success: false, error: error.message })
+                const s = error.message.includes('No autorizado') ? 401 : 400
+                res.status(s).json({ success: false, error: error.message })
             }
             break
 

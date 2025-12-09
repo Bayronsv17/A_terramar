@@ -3,7 +3,7 @@ import User from '../../../models/User'
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 
-const JWT_SECRET = process.env.JWT_SECRET || 'supersecret_jwt_key_change_me'
+const JWT_SECRET = process.env.JWT_SECRET || 'alma_terramar_secure_jwt_secret_2024_key_change_me'
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {
@@ -48,6 +48,6 @@ export default async function handler(req, res) {
         })
     } catch (error) {
         console.error(error)
-        res.status(500).json({ message: 'Error del servidor' })
+        res.status(500).json({ message: `Error del servidor: ${error.message}` })
     }
 }

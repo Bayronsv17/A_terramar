@@ -13,7 +13,12 @@ export default function AdminContacts() {
     const fetchContacts = useCallback(async () => {
         setLoading(true)
         try {
-            const res = await fetch('/api/admin/contacts')
+            const token = localStorage.getItem('token')
+            const res = await fetch('/api/admin/contacts', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
             const data = await res.json()
             if (data.success) {
                 setContacts(data.data)
@@ -29,7 +34,13 @@ export default function AdminContacts() {
     const deleteContact = async (id) => {
         if (!confirm('¿Estás seguro de eliminar este registro?')) return
         try {
-            const res = await fetch(`/api/admin/contacts?id=${id}`, { method: 'DELETE' })
+            const token = localStorage.getItem('token')
+            const res = await fetch(`/api/admin/contacts?id=${id}`, {
+                method: 'DELETE',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
             const data = await res.json()
             if (data.success) {
                 addToast('Registro eliminado', 'success')
@@ -44,9 +55,13 @@ export default function AdminContacts() {
 
     const updateStatus = async (id, newStatus) => {
         try {
+            const token = localStorage.getItem('token')
             const res = await fetch('/api/admin/contacts', {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
                 body: JSON.stringify({ id, status: newStatus })
             })
             const data = await res.json()
