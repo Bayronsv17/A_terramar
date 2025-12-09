@@ -85,11 +85,10 @@ export default function ContactForm() {
         const data = await res.json()
         setStatus('sent')
         setForm({ firstName: '', lastName: '', birthYear: '', birthDate: '', phone: '', address: '', email: '' })
-        if (data.preview) console.info('Preview URL:', data.preview)
         return
       }
 
-      // If server-side validation failed, show those errors instead of falling back
+      // If server-side validation failed, show those errors
       if (res.status === 400) {
         try {
           const d = await res.json()
@@ -98,22 +97,11 @@ export default function ContactForm() {
             setStatus(null)
             return
           }
-        } catch (e) { /* ignore and continue to fallback */ }
+        } catch (e) { }
       }
 
-      // fallback to Formspree
-      const FORMSPREE_ID = process.env.NEXT_PUBLIC_FORMSPREE_ID || '{TU_FORM_ID}'
-      const res2 = await fetch(`https://formspree.io/f/${FORMSPREE_ID}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      })
-      if (res2.ok) {
-        setStatus('sent')
-        setForm({ firstName: '', lastName: '', birthYear: '', birthDate: '', phone: '', address: '', email: '' })
-      } else {
-        setStatus('error')
-      }
+      // If we are here, something went wrong with the API (500, etc)
+      setStatus('error')
     } catch (err) {
       console.error(err)
       setStatus('error')

@@ -3,6 +3,7 @@ import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import AdminSidebar from '../../components/AdminSidebar'
 import AdminCMS from '../../components/AdminCMS'
+import AdminContacts from '../../components/AdminContacts'
 import { useRouter } from 'next/router'
 import { useToast } from '../../lib/ToastContext'
 
@@ -12,6 +13,7 @@ export default function AdminDashboard() {
     const [isAuthenticated, setIsAuthenticated] = useState(false)
     const [loading, setLoading] = useState(false)
     const [activeTab, setActiveTab] = useState('orders')
+    const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     // Order Management
     const [orders, setOrders] = useState([])
@@ -482,16 +484,33 @@ export default function AdminDashboard() {
             <Navbar />
 
             <div className="flex flex-1 items-stretch pt-20">
-                <AdminSidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+                <AdminSidebar
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
+                    isOpen={isMobileMenuOpen}
+                    onClose={() => setIsMobileMenuOpen(false)}
+                />
 
                 <main className="flex-1 min-w-0 h-[calc(100vh-80px)] overflow-y-auto bg-gray-50">
                     <div className="p-4 lg:p-8 max-w-[1400px] mx-auto">
                         {/* Mobile Header */}
-                        <div className="md:hidden mb-6 flex justify-between items-center">
-                            <h1 className="text-xl font-bold text-gray-800">Panel Admin</h1>
+                        <div className="lg:hidden mb-6 flex justify-between items-center">
+                            <div className="flex items-center gap-3">
+                                <button
+                                    onClick={() => setIsMobileMenuOpen(true)}
+                                    className="p-2 -ml-2 text-gray-700 hover:bg-gray-100 rounded-lg"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                                    </svg>
+                                </button>
+                                <h1 className="text-xl font-bold text-gray-800">Panel Admin</h1>
+                            </div>
                         </div>
 
-                        {activeTab === 'cms' ? (
+                        {activeTab === 'contacts' ? (
+                            <AdminContacts />
+                        ) : activeTab === 'cms' ? (
                             <AdminCMS />
                         ) : activeTab === 'orders' ? (
                             <div>

@@ -2,7 +2,7 @@ import Image from 'next/image'
 
 export default function Hero() {
   return (
-    <section className="relative py-28 md:py-36 overflow-hidden bg-gray-50">
+    <section id="home" className="relative py-28 md:py-36 overflow-hidden bg-gray-50">
       {/* Background Graphic Elements */}
       <div className="absolute top-0 right-0 -mr-20 -mt-20 w-[600px] h-[600px] bg-gradient-to-br from-cyan-100 to-purple-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob"></div>
       <div className="absolute -bottom-32 -left-20 w-[500px] h-[500px] bg-gradient-to-tr from-blue-100 to-pink-100 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-2000"></div>
@@ -59,10 +59,10 @@ export default function Hero() {
             <div className="absolute -bottom-4 -left-4 w-32 h-32 bg-purple-200 rounded-full opacity-50 blur-xl"></div>
 
             <Image
-              src="/assets/hero.jpg"
-              alt="AlmaTerramar - Consultora Terramar"
+              src="https://res.cloudinary.com/dih0cyoun/image/upload/v1765290317/Oleo_Tratamiento_pf6dlv.webp"
+              alt="Terramar Óleo Tratamiento - Producto Estrella"
               fill
-              className="object-cover rounded-3xl shadow-2xl z-10 relative"
+              className="object-contain drop-shadow-2xl z-10 relative hover:scale-105 transition-transform duration-500"
               priority
             />
 
