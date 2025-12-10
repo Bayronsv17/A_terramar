@@ -1,16 +1,15 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '../lib/ToastContext'
 
+// Helper function for video ID extraction moved outside/hoisted safely
+function extractVideoID(url) {
+    if (!url) return null
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+    const match = url.match(regExp);
+    return (match && match[2].length === 11) ? match[2] : null;
+}
+
 export default function AdminCMS() {
-
-    // Helper function for video ID extraction moved outside/hoisted safely
-    function extractVideoID(url) {
-        if (!url) return null
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
-
     const { addToast } = useToast()
     const [loading, setLoading] = useState(false)
 
@@ -23,10 +22,6 @@ export default function AdminCMS() {
 
     const [videos, setVideos] = useState([])
     const [testimonials, setTestimonials] = useState([])
-
-    useEffect(() => {
-        fetchSettings()
-    }, [fetchSettings])
 
     const fetchSettings = useCallback(async () => {
         setLoading(true)
@@ -50,6 +45,10 @@ export default function AdminCMS() {
             setLoading(false)
         }
     }, [addToast])
+
+    useEffect(() => {
+        fetchSettings()
+    }, [fetchSettings])
 
     const saveSection = async (key, value) => {
         setLoading(true)

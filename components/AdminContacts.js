@@ -16,10 +16,6 @@ export default function AdminContacts() {
     const [loading, setLoading] = useState(false)
     const { addToast } = useToast()
 
-    useEffect(() => {
-        fetchContacts()
-    }, [fetchContacts])
-
     const fetchContacts = useCallback(async () => {
         setLoading(true)
         try {
@@ -40,6 +36,10 @@ export default function AdminContacts() {
             setLoading(false)
         }
     }, [addToast])
+
+    useEffect(() => {
+        fetchContacts()
+    }, [fetchContacts])
 
     const deleteContact = async (id) => {
         if (!confirm('¿Estás seguro de eliminar este registro?')) return
