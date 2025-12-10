@@ -121,7 +121,7 @@ export default function ContactForm() {
           <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-1 rounded-full text-white text-sm font-medium mb-4">Únete al Equipo</span>
           <h2 className="text-4xl font-bold text-white mt-2">¿Lista para transformar tu vida?</h2>
           <p className="text-cyan-100 mt-4 text-lg max-w-2xl mx-auto">
-            Sé parte de una comunidad de mujeres exitosas. Déjame tus datos y te enseñaré cómo lograr tu independencia financiera con Terramar.
+            Sé parte de una comunidad de mujeres exitosas.
           </p>
         </div>
 

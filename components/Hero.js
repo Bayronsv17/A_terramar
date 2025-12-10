@@ -39,16 +39,7 @@ export default function Hero() {
             </a>
           </div>
 
-          <div className="mt-10 flex items-center justify-center md:justify-start gap-4">
-            <div className="flex -space-x-2">
-              <div className="w-10 h-10 rounded-full bg-gray-300 border-2 border-white"></div>
-              <div className="w-10 h-10 rounded-full bg-gray-400 border-2 border-white"></div>
-              <div className="w-10 h-10 rounded-full bg-gray-500 border-2 border-white"></div>
-            </div>
-            <p className="text-sm text-gray-500">
-              <span className="font-bold text-gray-900">+500 mujeres</span> ya han transformado su vida.
-            </p>
-          </div>
+
         </div>
 
         {/* Image Content */}
