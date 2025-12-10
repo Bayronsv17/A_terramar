@@ -2,10 +2,19 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import Navbar from '../../components/Navbar'
 import Footer from '../../components/Footer'
 import AdminSidebar from '../../components/AdminSidebar'
-import AdminCMS from '../../components/AdminCMS'
-import AdminContacts from '../../components/AdminContacts'
 import { useRouter } from 'next/router'
 import { useToast } from '../../lib/ToastContext'
+import dynamic from 'next/dynamic'
+
+const AdminCMS = dynamic(() => import('../../components/AdminCMS'), {
+    loading: () => <p className="p-4 text-center">Cargando editor...</p>,
+    ssr: false
+})
+const AdminContacts = dynamic(() => import('../../components/AdminContacts'), {
+    loading: () => <p className="p-4 text-center">Cargando contactos...</p>,
+    ssr: false
+})
+
 
 export default function AdminDashboard() {
     const { addToast } = useToast()
