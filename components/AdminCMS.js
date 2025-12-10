@@ -2,6 +2,15 @@ import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '../lib/ToastContext'
 
 export default function AdminCMS() {
+
+    // Helper function for video ID extraction moved outside/hoisted safely
+    function extractVideoID(url) {
+        if (!url) return null
+        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+        const match = url.match(regExp);
+        return (match && match[2].length === 11) ? match[2] : null;
+    }
+
     const { addToast } = useToast()
     const [loading, setLoading] = useState(false)
 
@@ -93,11 +102,7 @@ export default function AdminCMS() {
         }
         setVideos(newV)
     }
-    const extractVideoID = (url) => {
-        const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-        const match = url.match(regExp);
-        return (match && match[2].length === 11) ? match[2] : null;
-    }
+
 
     // Testimonials Updates
     const addTestimonial = () => {
