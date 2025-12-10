@@ -31,7 +31,7 @@ function cspHeaderValue() {
 
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  swcMinify: false,
   productionBrowserSourceMaps: false,
   // Cambiar carpeta de salida para evitar problemas de permisos en `.next`
   // distDir: 'build',
