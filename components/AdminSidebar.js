@@ -1,15 +1,16 @@
 import React from 'react'
 import { useRouter } from 'next/router'
+import { Package, Users, ShoppingBag, FileText, Settings, LogOut, X, Menu } from 'lucide-react'
 
 export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose }) {
     const router = useRouter()
 
     const menuItems = [
-        { id: 'orders', label: 'Pedidos', icon: '📦' },
-        { id: 'contacts', label: 'Prospectos', icon: '👥' },
-        { id: 'products', label: 'Productos', icon: '🛍️' },
-        { id: 'cms', label: 'Contenido Inicio', icon: '📝' },
-        { id: 'settings', label: 'Configuración', icon: '⚙️' },
+        { id: 'orders', label: 'Pedidos', icon: <Package size={20} /> },
+        { id: 'contacts', label: 'Prospectos', icon: <Users size={20} /> },
+        { id: 'products', label: 'Productos', icon: <ShoppingBag size={20} /> },
+        { id: 'cms', label: 'Contenido Inicio', icon: <FileText size={20} /> },
+        { id: 'settings', label: 'Configuración', icon: <Settings size={20} /> },
     ]
 
     const handleLogout = () => {
@@ -43,9 +44,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
                 <div className="p-4 border-b border-gray-100 flex justify-between items-center lg:hidden bg-gray-50">
                     <span className="font-bold text-gray-700">Menú</span>
                     <button onClick={onClose} className="p-2 text-gray-500 hover:bg-gray-200 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                        </svg>
+                        <X size={24} />
                     </button>
                 </div>
 
@@ -73,7 +72,7 @@ export default function AdminSidebar({ activeTab, setActiveTab, isOpen, onClose 
                         onClick={handleLogout}
                         className="w-full text-left px-4 py-3 rounded-xl flex items-center gap-3 text-red-600 hover:bg-red-50 transition-colors font-bold"
                     >
-                        <span>🚪</span>
+                        <LogOut size={20} />
                         <span>Cerrar Sesión</span>
                     </button>
                 </div>

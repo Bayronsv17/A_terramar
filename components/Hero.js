@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { CheckCircle } from 'lucide-react'
 
 export default function Hero() {
   return (
@@ -60,7 +61,7 @@ export default function Hero() {
             {/* Floating Badge */}
             <div className="absolute -bottom-6 -right-6 z-20 bg-white p-4 rounded-xl shadow-xl flex items-center gap-3 animate-bounce-slow">
               <div className="bg-green-100 p-2 rounded-full">
-                <svg className="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <CheckCircle className="w-6 h-6 text-green-600" />
               </div>
               <div>
                 <p className="text-xs text-gray-500 font-medium">Calidad Garantizada</p>

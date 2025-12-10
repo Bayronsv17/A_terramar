@@ -4,6 +4,17 @@ import Footer from '../components/Footer'
 import { useCart } from '../lib/CartContext'
 import ProductImage from '../components/ProductImage'
 import Link from 'next/link'
+import {
+    Package,
+    Calendar,
+    DollarSign,
+    ShoppingBag,
+    Clock,
+    CheckCircle,
+    ClipboardList,
+    Hash,
+    ArrowLeft
+} from 'lucide-react'
 
 export default function MisPedidos() {
     const { user } = useCart()
@@ -35,6 +46,35 @@ export default function MisPedidos() {
         }
     }, [user])
 
+    const getStatusBadge = (status) => {
+        switch (status) {
+            case 'Pendiente':
+                return (
+                    <span className="flex items-center gap-1 bg-yellow-100 text-yellow-700 px-3 py-1 rounded-full text-xs font-bold border border-yellow-200">
+                        <Clock size={12} /> PENDIENTE
+                    </span>
+                )
+            case 'Registrado':
+                return (
+                    <span className="flex items-center gap-1 bg-blue-100 text-blue-700 px-3 py-1 rounded-full text-xs font-bold border border-blue-200">
+                        <ClipboardList size={12} /> REGISTRADO
+                    </span>
+                )
+            case 'Ordenado':
+                return (
+                    <span className="flex items-center gap-1 bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-xs font-bold border border-emerald-200">
+                        <CheckCircle size={12} /> ORDENADO
+                    </span>
+                )
+            default:
+                return (
+                    <span className="bg-gray-100 text-gray-600 px-3 py-1 rounded-full text-xs font-bold border border-gray-200">
+                        {status}
+                    </span>
+                )
+        }
+    }
+
     if (loading) {
         return (
             <div className="min-h-screen flex flex-col bg-gray-50">
@@ -51,91 +91,125 @@ export default function MisPedidos() {
         <div className="min-h-screen flex flex-col bg-gray-50">
             <Navbar />
 
-            <main className="flex-1 container mx-auto px-4 py-24">
-                <h1 className="text-3xl font-bold text-gray-900 mb-8">Mis Pedidos</h1>
+            <main className="flex-1 container mx-auto px-4 py-24 max-w-4xl">
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+                    <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm text-cyan-600">
+                            <Package size={24} />
+                        </div>
+                        <div>
+                            <h1 className="text-3xl font-bold text-gray-900 leading-none">Mis Pedidos</h1>
+                            <p className="text-gray-500 text-sm mt-1">Historial de tus compras recientes</p>
+                        </div>
+                    </div>
+
+                    <Link href="/productos">
+                        <button className="group flex items-center gap-2 text-gray-600 bg-white border border-gray-200 px-4 py-2 rounded-lg font-bold hover:bg-gray-50 hover:text-cyan-600 transition-all text-sm shadow-sm">
+                            <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" />
+                            Regresar al Catálogo
+                        </button>
+                    </Link>
+                </div>
 
                 {orders.length === 0 ? (
-                    <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center">
-                        <p className="text-gray-500 mb-4">No has realizado ningún pedido aún.</p>
+                    <div className="bg-white p-12 rounded-2xl shadow-sm border border-gray-100 text-center">
+                        <div className="w-20 h-20 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-6 text-gray-300">
+                            <Package size={40} />
+                        </div>
+                        <h2 className="text-xl font-bold text-gray-900 mb-2">No tienes pedidos aún</h2>
+                        <p className="text-gray-500 mb-8 max-w-sm mx-auto">Cuando realices una compra, aparecerá aquí con todos los detalles de seguimiento.</p>
                         <Link href="/productos">
-                            <button className="bg-cyan-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-cyan-700 transition-colors">
-                                Ir a Comprar
+                            <button className="bg-gradient-to-r from-cyan-600 to-blue-600 text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-cyan-600/20 hover:shadow-cyan-600/30 hover:-translate-y-1 transition-all">
+                                Explorar Productos
                             </button>
                         </Link>
                     </div>
                 ) : (
                     <div className="space-y-6">
                         {orders.map((order) => (
-                            <div key={order._id} className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-                                {/* Order Header */}
-                                <div className="bg-gray-50 px-6 py-4 border-b border-gray-200 flex flex-col md:flex-row justify-between md:items-center gap-4 text-sm text-gray-600">
-                                    <div className="flex gap-8">
-                                        <div>
-                                            <span className="block text-xs uppercase font-bold text-gray-500">Fecha del pedido</span>
-                                            <span className="font-medium text-gray-900">{new Date(order.createdAt).toLocaleDateString('es-MX', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+                            <div key={order._id} className="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                                {/* Top Bar: Order ID & Status */}
+                                <div className="px-6 py-4 flex flex-wrap justify-between items-center bg-gray-50/50 border-b border-gray-100 gap-4">
+                                    <div className="flex items-center gap-2">
+                                        <div className="bg-white p-1.5 rounded-md border border-gray-200 text-gray-400">
+                                            <Hash size={16} />
                                         </div>
                                         <div>
-                                            <span className="block text-xs uppercase font-bold text-gray-500">Total</span>
-                                            <span className="font-medium text-gray-900">${order.total.toFixed(2)}</span>
-                                        </div>
-                                        <div>
-                                            <span className="block text-xs uppercase font-bold text-gray-500">Productos</span>
-                                            <span className="font-medium text-gray-900 text-center">{order.items.reduce((acc, item) => acc + item.quantity, 0)}</span>
-                                        </div>
-                                        <div>
-                                            <span className="block text-xs uppercase font-bold text-gray-500">Estatus</span>
-                                            {(() => {
-                                                const s = (order.status || '').toLowerCase()
-                                                const isPending = s === 'pending' || s === 'pendiente'
-                                                const isCompleted = s === 'completed' || s === 'ordenado' || s === 'confirmado' || s === 'entregado'
-
-                                                return (
-                                                    <span className={`font-bold ${isPending ? 'text-yellow-600' : isCompleted ? 'text-green-600' : 'text-gray-600'}`}>
-                                                        {isPending ? 'PENDIENTE' : isCompleted ? 'ORDENADO' : order.status}
-                                                    </span>
-                                                )
-                                            })()}
+                                            <span className="text-xs text-gray-500 font-bold uppercase block tracking-wider">Pedido</span>
+                                            <span className="font-mono text-gray-900 font-bold text-sm">#{order._id.slice(-6).toUpperCase()}</span>
                                         </div>
                                     </div>
-                                    <div className="text-right">
-                                        <span className="block text-xs uppercase font-bold text-gray-500">Pedido #</span>
-                                        <span className="font-mono text-gray-900 block">{order._id.slice(-6).toUpperCase()}</span>
-                                        <div className="mt-1">
-                                            <span className="text-[10px] uppercase font-bold text-gray-400 mr-1">Catálogo:</span>
-                                            <span className="text-xs text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded-full inline-block">
+
+                                    <div>
+                                        {getStatusBadge(order.status)}
+                                    </div>
+                                </div>
+
+                                {/* Meta Info Grid */}
+                                <div className="px-6 py-4 grid grid-cols-2 md:grid-cols-4 gap-4 border-b border-gray-100 bg-white">
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-gray-300"><Calendar size={18} /></div>
+                                        <div>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase block">Fecha</span>
+                                            <span className="text-sm font-medium text-gray-900">
+                                                {new Date(order.createdAt).toLocaleDateString('es-MX', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-gray-300"><DollarSign size={18} /></div>
+                                        <div>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase block">Total</span>
+                                            <span className="text-sm font-bold text-gray-900">${order.total.toFixed(2)}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-gray-300"><ShoppingBag size={18} /></div>
+                                        <div>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase block">Items</span>
+                                            <span className="text-sm font-medium text-gray-900">{order.items.reduce((acc, item) => acc + item.quantity, 0)} productos</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-3">
+                                        <div className="text-gray-300"><ClipboardList size={18} /></div>
+                                        <div>
+                                            <span className="text-[10px] text-gray-400 font-bold uppercase block">Catálogo</span>
+                                            <span className="text-sm font-bold text-blue-600 bg-blue-50 px-2 rounded-full text-xs inline-block">
                                                 {order.catalogName || 'General'}
                                             </span>
                                         </div>
                                     </div>
                                 </div>
 
-                                {/* Order Items */}
-                                <div className="p-6">
-                                    <div className="grid gap-6">
+                                {/* Order Items List */}
+                                <div className="p-6 bg-gray-50/10">
+                                    <div className="grid gap-4">
                                         {order.items.map((item, index) => {
-                                            // Handle case where product might have been deleted, though populate should handle it (returns null if not found)
-                                            // Ideally we store everything in order item? For now we relied on ref.
-                                            // If product details are populated:
-                                            // Use snapshot if available, otherwise fallback to populated product, otherwise default
                                             const product = {
                                                 name: item.name || item.product?.name || 'Producto no disponible',
                                                 key: item.key || item.product?.key || '00000',
-                                                price: item.priceAtOrder, // Use the price paid
-                                                image: item.image || item.product?.image || '/assets/placeholder.jpg'
+                                                price: item.priceAtOrder,
+                                                image: item.image || item.product?.image || '/assets/placeholder.jpg',
+                                                variant: item.product?.variant
                                             }
 
                                             return (
-                                                <div key={index} className="flex gap-4 items-start">
-                                                    <div className="w-16 h-16 bg-gray-100 rounded-lg flex-shrink-0 overflow-hidden p-1 border border-gray-100">
-                                                        <ProductImage product={product} />
+                                                <div key={index} className="flex gap-4 items-center bg-white p-3 rounded-xl border border-gray-100">
+                                                    <div className="w-16 h-16 bg-gray-50 rounded-lg flex-shrink-0 overflow-hidden border border-gray-200">
+                                                        <ProductImage product={product} className="object-cover w-full h-full" />
                                                     </div>
-                                                    <div className="flex-1">
-                                                        <h4 className="font-bold text-blue-900 text-sm md:text-base">{product.name}</h4>
-                                                        <p className="text-xs text-gray-500 mb-1">Clave: {product.key}</p>
-                                                        <div className="flex items-center gap-2 text-sm">
-                                                            <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded text-xs font-bold">Cantidad: {item.quantity}</span>
-                                                            <span className="font-bold text-cyan-600">${item.priceAtOrder}</span>
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="font-bold text-gray-900 text-sm md:text-base leading-tight">{product.name}</h4>
+                                                        <div className="flex flex-wrap gap-2 mt-1">
+                                                            <span className="text-xs text-gray-500 bg-gray-100 px-1.5 py-0.5 rounded font-mono">#{product.key}</span>
+                                                            {product.variant && (
+                                                                <span className="text-xs text-blue-600 bg-blue-50 px-1.5 py-0.5 rounded font-medium">{product.variant}</span>
+                                                            )}
                                                         </div>
+                                                    </div>
+                                                    <div className="text-right pl-2">
+                                                        <span className="block text-xs text-gray-500 font-medium mb-0.5">{item.quantity} x</span>
+                                                        <span className="font-bold text-cyan-600 text-sm whitespace-nowrap">${item.priceAtOrder}</span>
                                                     </div>
                                                 </div>
                                             )

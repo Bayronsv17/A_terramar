@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { Star } from 'lucide-react'
 
 export default function Testimonials({ testimonials }) {
   const [current, setCurrent] = useState(0)
@@ -84,7 +85,9 @@ export default function Testimonials({ testimonials }) {
                     <div className="relative z-10 flex flex-col items-center">
 
                       <div className="flex gap-1 text-yellow-400 mb-4 text-lg">
-                        {'★'.repeat(5)}
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={20} fill="currentColor" />
+                        ))}
                       </div>
 
                       <p className="text-gray-600 text-lg md:text-xl italic mb-6 leading-relaxed font-sans">

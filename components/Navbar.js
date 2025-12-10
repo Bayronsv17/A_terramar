@@ -3,6 +3,7 @@ import { useRouter } from 'next/router'
 import { useCart } from '../lib/CartContext'
 import Link from 'next/link'
 import { useToast } from '../lib/ToastContext'
+import { ShoppingBag, LogOut, Package, Home } from 'lucide-react'
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
@@ -75,14 +76,12 @@ export default function Navbar() {
             {userRole !== 'admin' && (
               <button
                 onClick={() => router.push('/mis-pedidos')}
-                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-cyan-50 transition-all"
+                className="group flex items-center gap-2 px-3 py-1.5 rounded-lg bg-cyan-50 hover:bg-cyan-100 transition-all border border-cyan-100"
               >
-                <div className="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center text-cyan-600 group-hover:bg-cyan-600 group-hover:text-white transition-colors">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                  </svg>
+                <div className="w-6 h-6 rounded-full bg-white flex items-center justify-center text-cyan-600 shadow-sm">
+                  <Package size={14} />
                 </div>
-                <span className="text-gray-700 font-medium text-sm group-hover:text-cyan-700 hidden sm:block">Mis Pedidos</span>
+                <span className="text-cyan-800 font-bold text-xs sm:text-sm">Mis Pedidos</span>
               </button>
             )}
 
@@ -94,9 +93,7 @@ export default function Navbar() {
               title="Cerrar Sesión"
             >
               <span className="hidden sm:block">Salir</span>
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
+              <LogOut size={20} />
             </button>
           </div>
         </div>
@@ -116,7 +113,10 @@ export default function Navbar() {
             </span>
           </div>
           <nav className="flex items-center space-x-8">
-            <Link href="/" className="text-gray-600 hover:text-cyan-600 font-medium transition-colors">Inicio</Link>
+            <Link href="/" className="flex items-center gap-2 px-4 py-2 rounded-full bg-gray-50 text-gray-600 hover:bg-cyan-50 hover:text-cyan-600 font-bold transition-all border border-gray-100 shadow-sm group">
+              <Home size={18} className="text-gray-400 group-hover:text-cyan-600 transition-colors" />
+              <span>Inicio</span>
+            </Link>
           </nav>
         </div>
       </header>

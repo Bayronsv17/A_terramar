@@ -95,8 +95,8 @@ export default function Registro() {
                                 value={formData.region}
                                 onChange={(e) => setFormData({ ...formData, region: e.target.value })}
                             >
-                                <option value="MX">México (MXN)</option>
-                                <option value="US">Estados Unidos (USD)</option>
+                                <option value="MX">México</option>
+                                <option value="US">Estados Unidos</option>
                             </select>
                         </div>
 

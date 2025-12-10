@@ -5,6 +5,10 @@ import { useCart } from '../lib/CartContext'
 import { useRouter } from 'next/router'
 import ProductCard from '../components/ProductCard'
 import { useToast } from '../lib/ToastContext'
+import {
+    Flower2, Heart, Scissors, Palette, Eye, Smile, LayoutGrid, Tag,
+    ChevronDown, ChevronLeft, ChevronRight, ShoppingCart, Zap, Check
+} from 'lucide-react'
 
 export default function Productos() {
     const [products, setProducts] = useState([])
@@ -224,9 +228,7 @@ export default function Productos() {
                             onClick={() => router.push('/carrito')}
                             className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl shadow-lg hover:shadow-cyan-500/30 hover:scale-105 transition-all flex items-center gap-2 relative active:scale-95"
                         >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
-                                <path fillRule="evenodd" d="M7.5 6v.75H5.513c-.96 0-1.764.724-1.865 1.679l-1.263 12A1.875 1.875 0 004.25 22.5h15.5a1.875 1.875 0 001.865-2.071l-1.263-12a1.875 1.875 0 00-1.865-1.679H16.5V6a4.5 4.5 0 10-9 0zM12 3a3 3 0 00-3 3v.75h6V6a3 3 0 00-3-3zm-3 8.25a3 3 0 106 0v-.75a.75.75 0 011.5 0v.75a4.5 4.5 0 11-9 0v-.75a.75.75 0 011.5 0v.75z" clipRule="evenodd" />
-                            </svg>
+                            <ShoppingCart className="w-4 h-4" />
                             {totalItems > 0 && (
                                 <span className="absolute -top-2 -right-2 bg-yellow-400 text-blue-900 text-[10px] font-extrabold rounded-full h-5 w-5 flex items-center justify-center border-2 border-white shadow-sm">
                                     {totalItems}
@@ -238,9 +240,7 @@ export default function Productos() {
 
                     <form onSubmit={handleAddByKey} className="flex items-center gap-2 bg-gray-50 p-2 rounded-lg border border-gray-200">
                         <div className="flex items-center gap-1 text-gray-400 px-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-yellow-500">
-                                <path fillRule="evenodd" d="M14.615 1.595a.75.75 0 01.359.852L12.982 9.75h7.268a.75.75 0 01.548 1.262l-10.5 11.25a.75.75 0 01-1.272-.71l1.992-7.302H3.75a.75.75 0 01-.548-1.262l10.5-11.25a.75.75 0 01.913-.143z" clipRule="evenodd" />
-                            </svg>
+                            <Zap className="w-4 h-4 text-yellow-500" />
                             <span className="text-xs font-bold hidden sm:inline uppercase">Rápido:</span>
                         </div>
                         <input
@@ -269,9 +269,7 @@ export default function Productos() {
                     <aside className="w-full lg:w-64 flex-shrink-0 z-30 sticky top-[70px] bg-gray-50 pb-2 lg:pb-0">
                         <div className="bg-white rounded-lg shadow-sm p-3 lg:p-4 border border-gray-100">
                             <h3 className="text-blue-900 font-bold mb-3 flex items-center gap-2 text-sm lg:text-base uppercase tracking-wider">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-yellow-600">
-                                    <path fillRule="evenodd" d="M3 6a3 3 0 013-3h2.25a3 3 0 013 3v2.25a3 3 0 01-3 3H6a3 3 0 01-3-3V6zm9.75 0a3 3 0 013-3H18a3 3 0 013 3v2.25a3 3 0 01-3 3h-2.25a3 3 0 01-3-3V6zM3 15.75a3 3 0 013-3h2.25a3 3 0 013 3v2.25a3 3 0 01-3 3H6a3 3 0 01-3-3v-2.25zm9.75 0a3 3 0 013-3H18a3 3 0 013 3v2.25a3 3 0 01-3 3h-2.25a3 3 0 01-3-3v-2.25z" clipRule="evenodd" />
-                                </svg>
+                                <LayoutGrid className="w-5 h-5 text-yellow-600" />
                                 Categorías
                             </h3>
                             {/* Hide scrollbar with inline styles for cross-browser support */}
@@ -289,15 +287,15 @@ export default function Productos() {
                                     // Emoji mapping as requested
                                     const getIcon = (c) => {
                                         const lower = c.toLowerCase()
-                                        if (lower.includes('fragan')) return '🌸'
-                                        if (lower.includes('cuerpo') || lower.includes('piel')) return '🧴'
-                                        if (lower.includes('cabello')) return '💇'
-                                        if (lower.includes('maqui')) return '💄'
+                                        if (lower.includes('fragan')) return <Flower2 size={24} />
+                                        if (lower.includes('cuerpo') || lower.includes('piel')) return <Heart size={24} />
+                                        if (lower.includes('cabello')) return <Scissors size={24} />
+                                        if (lower.includes('maqui')) return <Palette size={24} />
                                         // Ojos - Paintbrush (Abstract for Mascara Wand/Application)
-                                        if (lower.includes('ojo')) return '🖌️'
-                                        if (lower.includes('rostro') || lower.includes('cara')) return '🧖‍♀️'
-                                        if (lower.includes('todas')) return '🌟'
-                                        return '🏷️'
+                                        if (lower.includes('ojo')) return <Eye size={24} />
+                                        if (lower.includes('rostro') || lower.includes('cara')) return <Smile size={24} />
+                                        if (lower.includes('todas')) return <LayoutGrid size={24} />
+                                        return <Tag size={24} />
                                     }
 
                                     return (
@@ -324,9 +322,7 @@ export default function Productos() {
 
                                                 {/* Desktop Arrow */}
                                                 {selectedCategory === cat && (
-                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4 hidden lg:block text-yellow-400">
-                                                        <path fillRule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clipRule="evenodd" />
-                                                    </svg>
+                                                    <Check className="w-4 h-4 hidden lg:block text-yellow-400" />
                                                 )}
                                             </button>
                                         </li>
@@ -368,9 +364,7 @@ export default function Productos() {
                                             disabled={currentPage === 1}
                                             className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                                            </svg>
+                                            <ChevronLeft className="w-5 h-5" />
                                         </button>
 
                                         {/* Custom Scrollable Page Picker */}
@@ -380,9 +374,7 @@ export default function Productos() {
                                                 className="w-full h-full bg-white border border-blue-900/10 rounded-full shadow-sm flex items-center justify-center gap-2 px-4 text-blue-900 font-bold active:scale-95 transition-all text-sm sm:text-base whitespace-nowrap"
                                             >
                                                 <span>Página {currentPage} de {totalPages}</span>
-                                                <svg xmlns="http://www.w3.org/2000/svg" className={`h-4 w-4 text-blue-900/50 transition-transform duration-300 ${isPageDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                                                </svg>
+                                                <ChevronDown className={`h-4 w-4 text-blue-900/50 transition-transform duration-300 ${isPageDropdownOpen ? 'rotate-180' : ''}`} />
                                             </button>
 
                                             {/* Dropdown Menu */}
@@ -411,9 +403,7 @@ export default function Productos() {
                                                                 >
                                                                     <span>Página {pageNum}</span>
                                                                     {currentPage === pageNum && (
-                                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-blue-900" viewBox="0 0 20 20" fill="currentColor">
-                                                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                                                                        </svg>
+                                                                        <Check className="h-4 w-4 text-blue-900" />
                                                                     )}
                                                                 </button>
                                                             ))}
@@ -431,9 +421,7 @@ export default function Productos() {
                                             disabled={currentPage === totalPages}
                                             className="w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm flex items-center justify-center text-gray-600 hover:bg-gray-50 active:scale-95 transition-all disabled:opacity-50"
                                         >
-                                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                                            </svg>
+                                            <ChevronRight className="w-5 h-5" />
                                         </button>
 
                                     </div>
@@ -456,9 +444,7 @@ export default function Productos() {
                                     onClick={() => router.push('/carrito')}
                                     className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white font-bold py-3 px-8 rounded-full shadow-xl shadow-cyan-600/20 hover:scale-105 hover:shadow-cyan-600/40 transform active:scale-95 transition-all flex items-center gap-3"
                                 >
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-6 h-6">
-                                        <path d="M2.25 2.25a.75.75 0 000 1.5h1.386c.17 0 .318.114.362.278l2.555 9.592a3.752 3.752 0 00-2.872 4.13C3.842 20.232 5.37 21.75 7.333 21.75c1.992 0 3.6-1.586 3.758-3.75H14.908c.16 2.164 1.766 3.75 3.758 3.75 1.963 0 3.49-1.518 3.654-3.998a3.752 3.752 0 00-2.872-4.13l1.838-6.896a.75.75 0 00-.73-.943H5.97L5.56 2.628a.75.75 0 00-.728-.553H2.25zm13.5 15a2.25 2.25 0 110-4.5 2.25 2.25 0 010 4.5zM8.25 17.25a2.25 2.25 0 10-4.5 0 2.25 2.25 0 004.5 0z" />
-                                    </svg>
+                                    <ShoppingCart className="w-6 h-6" />
                                     Ver Carrito
                                 </button>
                             </div>

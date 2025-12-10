@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useToast } from '../lib/ToastContext'
+import { FileText, Trash2, Plus } from 'lucide-react'
 
 // Helper function for video ID extraction moved outside/hoisted safely
 function extractVideoID(url) {
@@ -120,7 +121,7 @@ export default function AdminCMS() {
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in p-6">
             <h1 className="text-2xl font-bold text-gray-800 mb-6 flex items-center gap-2">
-                <span>📝</span> Editor de Contenido Inicio
+                <FileText size={28} className="text-gray-800" /> Editor de Contenido Inicio
             </h1>
 
             {/* HIGHLIGHTS SECTION */}
@@ -197,11 +198,11 @@ export default function AdminCMS() {
                                     </div>
                                 </div>
                             </div>
-                            <button onClick={() => removeVideo(idx)} className="text-red-500 hover:text-red-700 p-2">🗑️</button>
+                            <button onClick={() => removeVideo(idx)} className="text-red-500 hover:text-red-700 p-2"><Trash2 size={18} /></button>
                         </div>
                     ))}
-                    <button onClick={addVideo} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-cyan-500 hover:text-cyan-600 transition-colors">
-                        + Agregar Video
+                    <button onClick={addVideo} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-cyan-500 hover:text-cyan-600 transition-colors flex items-center justify-center gap-2">
+                        <Plus size={18} /> Agregar Video
                     </button>
                 </div>
             </section>
@@ -245,11 +246,11 @@ export default function AdminCMS() {
                                     className="w-full p-2 border rounded text-sm h-20 resize-none"
                                 />
                             </div>
-                            <button onClick={() => removeTestimonial(idx)} className="text-red-500 hover:text-red-700 p-2">🗑️</button>
+                            <button onClick={() => removeTestimonial(idx)} className="text-red-500 hover:text-red-700 p-2"><Trash2 size={18} /></button>
                         </div>
                     ))}
-                    <button onClick={addTestimonial} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-purple-500 hover:text-purple-600 transition-colors">
-                        + Agregar Testimonio
+                    <button onClick={addTestimonial} className="w-full py-2 border-2 border-dashed border-gray-300 rounded-lg text-gray-500 hover:border-purple-500 hover:text-purple-600 transition-colors flex items-center justify-center gap-2">
+                        <Plus size={18} /> Agregar Testimonio
                     </button>
                 </div>
             </section>

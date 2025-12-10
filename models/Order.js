@@ -37,7 +37,7 @@ const OrderSchema = new mongoose.Schema({
     },
     status: {
         type: String,
-        enum: ['Pendiente', 'Confirmado', 'Entregado', 'Cancelado'],
+        enum: ['Pendiente', 'Registrado', 'Ordenado'],
         default: 'Pendiente',
     },
     createdAt: {

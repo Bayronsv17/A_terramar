@@ -1,5 +1,6 @@
 import React, { memo } from 'react'
 import ProductImage from './ProductImage'
+import { Plus, Minus } from 'lucide-react'
 
 const ProductCard = memo(({ product, quantity, onAdd, onRemove, region = 'MX' }) => {
     // Determine price based on region
@@ -73,15 +74,15 @@ const ProductCard = memo(({ product, quantity, onAdd, onRemove, region = 'MX' })
                         <div className="flex bg-cyan-50 text-cyan-700 rounded-lg overflow-hidden border border-cyan-100 shadow-sm">
                             <button
                                 onClick={() => onRemove(product._id || product.key)}
-                                className="px-3 py-1.5 hover:bg-cyan-100 transition-colors font-bold text-lg leading-none"
-                            >-</button>
+                                className="px-3 py-1.5 hover:bg-cyan-100 transition-colors font-bold text-lg leading-none flex items-center justify-center"
+                            ><Minus size={14} /></button>
                             <div className="flex-1 text-center py-1.5 font-bold text-sm flex items-center justify-center">
                                 {quantity}
                             </div>
                             <button
                                 onClick={() => onAdd({ ...product, price, originalPrice })}
-                                className="px-3 py-1.5 hover:bg-cyan-100 transition-colors font-bold text-lg leading-none"
-                            >+</button>
+                                className="px-3 py-1.5 hover:bg-cyan-100 transition-colors font-bold text-lg leading-none flex items-center justify-center"
+                            ><Plus size={14} /></button>
                         </div>
                     ) : (
                         <button

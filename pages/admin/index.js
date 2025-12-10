@@ -5,6 +5,18 @@ import AdminSidebar from '../../components/AdminSidebar'
 import { useRouter } from 'next/router'
 import { useToast } from '../../lib/ToastContext'
 import dynamic from 'next/dynamic'
+import {
+    Clock,
+    ClipboardList,
+    CheckCircle,
+    Smartphone,
+    ChevronDown,
+    Package,
+    AlertTriangle,
+    FileText,
+    Upload,
+    Trash2
+} from 'lucide-react'
 
 const AdminCMS = dynamic(() => import('../../components/AdminCMS'), {
     loading: () => <p className="p-4 text-center">Cargando editor...</p>,
@@ -61,6 +73,26 @@ export default function AdminDashboard() {
         discountOptions.push(discountIdx)
     }
 
+    const detectCurrency = (order) => {
+        // Primary Check: Phone Number Country Code
+        const phone = order.clientPhone ? order.clientPhone.replace(/\D/g, '') : ''
+        if (phone.startsWith('52')) return 'MXN'
+        if (phone.startsWith('1')) return 'USD'
+
+        // Secondary Heuristic: Price Magnitude
+        // If items exist, check the price of the first item
+        if (order.items && order.items.length > 0) {
+            const firstPrice = order.items[0].priceAtOrder
+            // Assuming no individual beauty product is > $100 USD in this context usually, 
+            // but in MXN they are usually > $200. 
+            // A safe threshold might be 150.
+            if (firstPrice > 150) return 'MXN'
+            return 'USD'
+        }
+
+        // Fallback
+        return 'MXN'
+    }
     const fetchOrders = useCallback(async () => {
         setLoading(true)
         try {
@@ -113,7 +145,7 @@ export default function AdminDashboard() {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ id: orderId, status: newStatus })
+                body: JSON.stringify({ orderId, status: newStatus })
             })
             const data = await res.json()
             if (data.success) {
@@ -563,16 +595,24 @@ export default function AdminDashboard() {
                                                         <select
                                                             value={order.status || 'pending'}
                                                             onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                                                            className={`appearance-none pl-3 pr-8 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 ${order.status === 'completed'
+                                                            className={`appearance-none pl-9 pr-8 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 ${order.status === 'Ordenado'
                                                                 ? 'bg-emerald-100 text-emerald-800 border-emerald-200 focus:ring-emerald-500'
-                                                                : 'bg-orange-100 text-orange-800 border-orange-200 focus:ring-orange-500'
+                                                                : order.status === 'Registrado'
+                                                                    ? 'bg-blue-100 text-blue-800 border-blue-200 focus:ring-blue-500'
+                                                                    : 'bg-orange-100 text-orange-800 border-orange-200 focus:ring-orange-500'
                                                                 }`}
                                                         >
-                                                            <option value="pending">⏳ Pendiente</option>
-                                                            <option value="completed">✅ Ordenado</option>
+                                                            <option value="Pendiente">Pendiente</option>
+                                                            <option value="Registrado">Registrado</option>
+                                                            <option value="Ordenado">Ordenado</option>
                                                         </select>
-                                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                                            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                                        <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                            {order.status === 'Ordenado' ? <CheckCircle size={14} className="text-emerald-800" /> :
+                                                                order.status === 'Registrado' ? <ClipboardList size={14} className="text-blue-800" /> :
+                                                                    <Clock size={14} className="text-orange-800" />}
+                                                        </div>
+                                                        <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current opacity-60">
+                                                            <ChevronDown size={14} />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -582,7 +622,7 @@ export default function AdminDashboard() {
                                                         <div>
                                                             <h3 className="font-bold text-gray-900 text-lg">{order.clientName}</h3>
                                                             <a href={`https://wa.me/${order.clientPhone.replace(/\D/g, '')}`} target="_blank" rel="noreferrer" className="text-green-600 text-sm font-medium hover:underline flex items-center gap-1">
-                                                                <span>📱</span> {order.clientPhone}
+                                                                <Smartphone size={14} /> {order.clientPhone}
                                                             </a>
                                                         </div>
                                                         {order.catalogName && (
@@ -596,18 +636,32 @@ export default function AdminDashboard() {
                                                         <h4 className="text-xs font-bold text-gray-400 uppercase mb-2">Productos ({order.items.reduce((a, c) => a + c.quantity, 0)})</h4>
                                                         <ul className="space-y-3">
                                                             {order.items.map((item, idx) => (
-                                                                <li key={idx} className="flex gap-3 text-sm border-b border-gray-100 last:border-0 pb-2 last:pb-0">
-                                                                    <div className="font-bold text-gray-900 w-6 text-right shrink-0">{item.quantity}x</div>
+                                                                <li key={idx} className="flex gap-4 border-b border-gray-100 last:border-0 pb-3 last:pb-0 items-center">
                                                                     <div className="flex-1">
-                                                                        <div className="text-gray-900 font-medium leading-tight">{item.name || item.product?.name || 'Producto desconocido'}</div>
-                                                                        <div className="text-xs text-gray-500 mt-1">
-                                                                            Clave: <span className="font-bold text-gray-700">{item.key || item.product?.key || 'N/A'}</span>
-                                                                            {item.product?.variant && (
-                                                                                <span className="ml-2 pl-2 border-l border-gray-300">
-                                                                                    Var: {item.product.variant}
-                                                                                </span>
-                                                                            )}
+                                                                        <div className="flex items-baseline gap-2 mb-1">
+                                                                            <span className="text-lg font-black text-blue-900 bg-blue-50 px-2 rounded">{item.quantity}x</span>
+                                                                            <span className="font-bold text-gray-800 text-sm leading-tight">{item.name || item.product?.name || 'Producto desconocido'}</span>
                                                                         </div>
+
+                                                                        <div className="flex items-center gap-3 mt-1">
+                                                                            <div className="flex items-center gap-1 bg-gray-100 border border-gray-200 rounded px-2 py-0.5">
+                                                                                <span className="text-[10px] uppercase font-bold text-gray-500">Clave</span>
+                                                                                <span className="font-mono font-bold text-gray-900 text-sm">{item.key || item.product?.key || 'N/A'}</span>
+                                                                            </div>
+
+                                                                            <span className="font-bold text-emerald-700 text-sm">
+                                                                                ${item.priceAtOrder}
+                                                                                <span className="text-xs ml-1 text-emerald-600 font-normal">
+                                                                                    {detectCurrency(order)}
+                                                                                </span>
+                                                                            </span>
+                                                                        </div>
+
+                                                                        {item.product?.variant && (
+                                                                            <div className="mt-1 text-xs text-blue-600 font-medium pl-2 border-l-2 border-blue-200">
+                                                                                Variante: {item.product.variant}
+                                                                            </div>
+                                                                        )}
                                                                     </div>
                                                                 </li>
                                                             ))}
@@ -664,19 +718,25 @@ export default function AdminDashboard() {
                                                                 </a>
                                                             </td>
                                                             <td className="px-6 py-4 text-sm text-gray-500">
-                                                                <ul className="space-y-1">
+                                                                <ul className="space-y-2">
                                                                     {order.items.map((item, idx) => (
-                                                                        <li key={idx} className="flex gap-2 text-sm items-start">
-                                                                            <span className="font-bold text-gray-900 w-5 pt-0.5">{item.quantity}x</span>
-                                                                            <div className="flex flex-col">
-                                                                                <span className="text-gray-800 font-medium">{item.name || item.product?.name || 'Unknown'}</span>
-                                                                                <span className="text-xs text-gray-500 mt-0.5 flex items-center gap-2">
-                                                                                    <span className="flex items-center gap-1 bg-slate-100 border border-slate-200 rounded px-1.5 py-0.5">
-                                                                                        <span className="text-[10px] uppercase font-bold text-slate-400">Clave</span>
-                                                                                        <span className="font-mono font-bold text-slate-700">{item.key || item.product?.key}</span>
-                                                                                    </span>
-                                                                                    {item.product?.variant && <span className="text-gray-500 pl-2 border-l border-gray-300">{item.product.variant}</span>}
-                                                                                </span>
+                                                                        <li key={idx} className="flex gap-3 items-center">
+                                                                            <div className="w-8 h-8 flex-shrink-0 bg-white rounded border border-gray-200 overflow-hidden">
+                                                                                <img
+                                                                                    src={item.image || item.product?.image || 'https://via.placeholder.com/80?text=No+Img'}
+                                                                                    alt={item.name}
+                                                                                    className="w-full h-full object-contain"
+                                                                                />
+                                                                            </div>
+                                                                            <div className="flex-1 min-w-0">
+                                                                                <div className="text-sm font-medium text-gray-900 truncate">
+                                                                                    <span className="font-bold mr-1">{item.quantity}x</span>
+                                                                                    {item.name || item.product?.name || 'Unknown'}
+                                                                                </div>
+                                                                                <div className="text-xs text-gray-500 flex gap-2">
+                                                                                    <span className="font-mono bg-gray-50 px-1 rounded">{item.key || item.product?.key}</span>
+                                                                                    {item.product?.variant && <span className="text-blue-500 italic">{item.product.variant}</span>}
+                                                                                </div>
                                                                             </div>
                                                                         </li>
                                                                     ))}
@@ -686,20 +746,28 @@ export default function AdminDashboard() {
                                                                 ${order.total ? order.total.toFixed(2) : '0.00'}
                                                             </td>
                                                             <td className="px-6 py-4 whitespace-nowrap">
-                                                                <div className="relative inline-block w-full max-w-[140px]">
+                                                                <div className="relative inline-block w-full max-w-[150px]">
                                                                     <select
                                                                         value={order.status || 'pending'}
                                                                         onChange={(e) => handleStatusChange(order._id, e.target.value)}
-                                                                        className={`w-full appearance-none pl-3 pr-8 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 ${order.status === 'completed'
+                                                                        className={`w-full appearance-none pl-9 pr-8 py-2 rounded-full text-xs font-bold uppercase tracking-wider border transition-all cursor-pointer outline-none focus:ring-2 focus:ring-offset-1 ${order.status === 'Ordenado'
                                                                             ? 'bg-emerald-100 text-emerald-800 border-emerald-200 focus:ring-emerald-500'
-                                                                            : 'bg-orange-100 text-orange-800 border-orange-200 focus:ring-orange-500'
+                                                                            : order.status === 'Registrado'
+                                                                                ? 'bg-blue-100 text-blue-800 border-blue-200 focus:ring-blue-500'
+                                                                                : 'bg-orange-100 text-orange-800 border-orange-200 focus:ring-orange-500'
                                                                             }`}
                                                                     >
-                                                                        <option value="pending">Pendiente</option>
-                                                                        <option value="completed">Ordenado</option>
+                                                                        <option value="Pendiente">Pendiente</option>
+                                                                        <option value="Registrado">Registrado</option>
+                                                                        <option value="Ordenado">Ordenado</option>
                                                                     </select>
-                                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-500">
-                                                                        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" /></svg>
+                                                                    <div className="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3">
+                                                                        {order.status === 'Ordenado' ? <CheckCircle size={14} className="text-emerald-800" /> :
+                                                                            order.status === 'Registrado' ? <ClipboardList size={14} className="text-blue-800" /> :
+                                                                                <Clock size={14} className="text-orange-800" />}
+                                                                    </div>
+                                                                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-current opacity-60">
+                                                                        <ChevronDown size={14} />
                                                                     </div>
                                                                 </div>
                                                             </td>
@@ -714,8 +782,8 @@ export default function AdminDashboard() {
                         ) : activeTab === 'bulk' ? (
                             <div className="max-w-3xl mx-auto">
                                 <div className="bg-white p-8 rounded-xl shadow-sm border border-amber-100 text-center mb-8">
-                                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                                        <span className="text-3xl">📦</span>
+                                    <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4 text-amber-600">
+                                        <Package size={32} />
                                     </div>
                                     <h2 className="text-2xl font-bold text-gray-900 mb-2">Carga Masiva de Productos</h2>
                                     <p className="text-gray-600 mb-6 max-w-lg mx-auto">Actualiza precios, crea nuevos productos o inicia una nueva temporada subiendo un archivo CSV.</p>
@@ -734,7 +802,7 @@ export default function AdminDashboard() {
                                                 className="w-full bg-white border border-red-300 text-red-600 font-bold py-2 rounded-lg hover:bg-red-50 transition-colors text-sm"
                                                 disabled={loading}
                                             >
-                                                ⚠️ Reiniciar Temporada (Quitar Descuentos)
+                                                <span className="flex items-center gap-2 justify-center"><AlertTriangle size={16} /> Reiniciar Temporada (Quitar Descuentos)</span>
                                             </button>
                                         </div>
 
